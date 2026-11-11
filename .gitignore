@@ -1,0 +1,65 @@
+# --- Variables de entorno y secretos ---
+.env
+.env.*
+!.env.example
+*.env
+secrets/
+*.secret
+credentials*.json
+service-account*.json
+client_secret*.json
+
+# --- Llaves y certificados ---
+*.pem
+*.key
+*.crt
+*.cer
+*.p12
+*.pfx
+*.jks
+*.keystore
+id_rsa*
+id_ed25519*
+*.ppk
+nginx/certs/
+nginx/ssl/
+
+# --- Bases de datos y volcados ---
+*.sql
+*.sql.gz
+*.dump
+*.backup
+*.bak
+*.sqlite
+*.sqlite3
+*.db
+pgdata/
+postgres-data/
+
+# --- Datos reales / datasets del evento ---
+data/datasets/
+data/raw/
+data/privado/
+*.csv
+*.xlsx
+*.xls
+*.parquet
+
+# --- Logs (pueden contener datos personales de PQRSD) ---
+*.log
+logs/
+
+# --- Dependencias y artefactos ---
+node_modules/
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+dist/
+build/
+
+# --- Editor / SO ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
