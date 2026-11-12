@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import FormularioPqrsd from '../components/FormularioPqrsd.jsx'
 import {
   consultarChat,
   continuarConPqrsd,
@@ -44,33 +45,16 @@ function Fuentes({ fuentes }) {
   )
 }
 
-function RadicacionSugerida({ sugerida, alCambiar }) {
+function RadicacionSugerida({ sugerida }) {
+  // Usa el formulario de US-007 con lo conversado; el ciudadano revisa y confirma.
   return (
     <section style={estilos.tarjeta} aria-labelledby="titulo-pqrsd">
       <h2 id="titulo-pqrsd" style={{ marginTop: 0, fontSize: '1.15rem' }}>Continuar con una PQRSD</h2>
       <p>{sugerida.mensaje}</p>
-      <label htmlFor="asunto">Asunto</label>
-      <input
-        id="asunto"
-        style={estilos.campo}
-        value={sugerida.asunto}
-        maxLength={300}
-        onChange={(e) => alCambiar({ ...sugerida, asunto: e.target.value })}
+      <FormularioPqrsd
+        canal="chat"
+        valoresIniciales={{ asunto: sugerida.asunto, descripcion: sugerida.descripcion }}
       />
-      <label htmlFor="descripcion" style={{ display: 'block', marginTop: '0.75rem' }}>Descripción</label>
-      <textarea
-        id="descripcion"
-        style={{ ...estilos.campo, minHeight: 160 }}
-        value={sugerida.descripcion}
-        onChange={(e) => alCambiar({ ...sugerida, descripcion: e.target.value })}
-      />
-      <div style={estilos.acciones}>
-        {/* La radicación (US-007) aún no existe: el botón queda desactivado. */}
-        <button type="button" style={{ ...estilos.boton, opacity: 0.55, cursor: 'not-allowed' }} disabled>
-          Radicar
-        </button>
-        <span style={estilos.nota}>Disponible cuando se integre la radicación.</span>
-      </div>
     </section>
   )
 }
@@ -189,7 +173,7 @@ export default function Chat() {
         </div>
       )}
 
-      {sugerida && <RadicacionSugerida sugerida={sugerida} alCambiar={setSugerida} />}
+      {sugerida && <RadicacionSugerida sugerida={sugerida} />}
 
       {error && (
         <p role="alert" style={{ ...estilos.error, marginTop: '1rem' }}>
