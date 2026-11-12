@@ -11,13 +11,22 @@ export class ErrorApi extends Error {
 }
 
 export async function solicitar(ruta, opciones = {}) {
-  const respuesta = await fetch(`${BASE_API}${ruta}`, {
-    ...opciones,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(opciones.headers || {}),
-    },
-  })
+  let respuesta
+  try {
+    respuesta = await fetch(`${BASE_API}${ruta}`, {
+      ...opciones,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(opciones.headers || {}),
+      },
+    })
+  } catch {
+    // fetch solo falla así cuando no hay conexión con el servidor ("Failed to fetch").
+    throw new ErrorApi(
+      'No pudimos conectarnos con el servidor. Revise su conexión e intente de nuevo; sus datos siguen en el formulario.',
+      0,
+    )
+  }
   if (!respuesta.ok) {
     // El backend devuelve {"detail": "mensaje en español"} en sus errores.
     let mensaje = `Error ${respuesta.status} al consultar el servidor.`
