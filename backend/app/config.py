@@ -15,6 +15,7 @@ from pydantic import Field, SecretStr, ValidationError, field_validator
 from pydantic_core import PydanticCustomError
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+
 class Configuracion(BaseSettings):
     # Los nombres de los campos coinciden con las variables de entorno
     # (sin distinguir mayúsculas y minúsculas).

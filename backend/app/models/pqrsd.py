@@ -29,12 +29,12 @@ def generar_radicado() -> str:
     return f"PQRSD-{anio}-{sufijo}"
 
 
-class CanalPQRSD(str, enum.Enum):
+class CanalPQRSD(enum.StrEnum):
     formulario = "formulario"
     chat = "chat"
 
 
-class TipoPQRSD(str, enum.Enum):
+class TipoPQRSD(enum.StrEnum):
     peticion = "peticion"
     queja = "queja"
     reclamo = "reclamo"
@@ -42,7 +42,7 @@ class TipoPQRSD(str, enum.Enum):
     denuncia = "denuncia"
 
 
-class EstadoPQRSD(str, enum.Enum):
+class EstadoPQRSD(enum.StrEnum):
     recibida = "recibida"
     clasificada = "clasificada"
     pendiente_revision_clasificacion = "pendiente_revision_clasificacion"
