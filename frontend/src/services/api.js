@@ -48,6 +48,16 @@ export function radicarPqrsd(datos) {
   return enviar('/pqrsd', datos)
 }
 
+// --- Chat de radicación (US-008) ---
+
+export function enviarMensajeRadicacion(sesionId, mensaje) {
+  return enviar('/chat/radicacion/mensaje', { sesion_id: sesionId, mensaje })
+}
+
+export function confirmarRadicacionChat(sesionId) {
+  return enviar('/chat/radicacion/confirmar', { sesion_id: sesionId })
+}
+
 // --- Chat de desvío (US-009) ---
 
 export function consultarChat(sesionId, mensaje) {

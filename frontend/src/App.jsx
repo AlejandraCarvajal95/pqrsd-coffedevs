@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, Route, Routes } from 'react-router-dom'
 import Chat from './pages/Chat.jsx'
 import Radicar from './pages/Radicar.jsx'
+import RadicarChat from './pages/RadicarChat.jsx'
 import { obtenerSalud } from './services/api.js'
 
 // Pantalla inicial: solo comprueba que el backend y la base respondan.
@@ -31,6 +32,7 @@ function EstadoSistema() {
       <ul>
         <li><Link to="/chat">Ir al asistente virtual</Link></li>
         <li><Link to="/radicar">Radicar una PQRSD</Link></li>
+        <li><Link to="/radicar/chat">Radicar contándole mi caso al asistente</Link></li>
       </ul>
     </main>
   )
@@ -41,6 +43,7 @@ export default function App() {
     <Routes>
       <Route path="/chat" element={<Chat />} />
       <Route path="/radicar" element={<Radicar />} />
+      <Route path="/radicar/chat" element={<RadicarChat />} />
       <Route path="*" element={<EstadoSistema />} />
     </Routes>
   )
