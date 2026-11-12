@@ -17,6 +17,15 @@ from app.pipeline.costos import ErrorIA, LimiteExcedido, gasto_por_tarea, gasto_
 
 router = APIRouter(prefix="/costos", tags=["costos"])
 
+# Nombres legibles de los campos para los mensajes de validación (422).
+ETIQUETAS_CAMPOS = {
+    "nombre_ciudadano": "nombre (obligatorio)",
+    "contacto": "contacto (correo o teléfono, obligatorio)",
+    "asunto": "asunto (obligatorio, máximo 300 caracteres)",
+    "descripcion": "descripción (obligatoria, máximo 4000 caracteres)",
+    "canal": "canal",
+}
+
 
 @router.get("")
 def resumen_de_gasto(sesion: Annotated[Session, Depends(obtener_sesion)]) -> dict:
@@ -51,9 +60,11 @@ def registrar_manejadores(app: FastAPI) -> None:
         if "mensaje" in campos:
             detalle = "El mensaje debe tener entre 1 y 1000 caracteres."
         elif campos:
-            detalle = f"Datos inválidos en: {', '.join(campos)}."
+            nombres = [ETIQUETAS_CAMPOS.get(campo, campo) for campo in campos]
+            detalle = f"Revise estos campos: {', '.join(nombres)}."
         return JSONResponse(
-            status_code=422, content={"detail": detalle, "codigo": "datos_invalidos"}
+            status_code=422,
+            content={"detail": detalle, "codigo": "datos_invalidos", "campos": campos},
         )
 
     @app.exception_handler(ErrorIA)
