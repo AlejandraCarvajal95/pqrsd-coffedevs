@@ -1,0 +1,77 @@
+{
+  "descripcion": "Consultas ficticias para probar a mano el chat de desvío (US-009). cobertura_esperada: total, parcial o ninguna. Las de 'no cubiertas' y 'ajenas' deben responder con el mensaje fijo.",
+  "consultas": [
+    {
+      "grupo": "cubierta",
+      "pregunta": "¿Por qué me cobran cuota de manejo si no he usado la tarjeta este mes?",
+      "cobertura_esperada": "total",
+      "documento_esperado": "faq_clientes.md"
+    },
+    {
+      "grupo": "cubierta",
+      "pregunta": "Quiero cancelar mi tarjeta de crédito, ¿qué pasa si todavía tengo saldo?",
+      "cobertura_esperada": "total",
+      "documento_esperado": "faq_clientes.md"
+    },
+    {
+      "grupo": "cubierta",
+      "pregunta": "¿Me pueden reportar en una central de riesgo sin avisarme antes?",
+      "cobertura_esperada": "total",
+      "documento_esperado": "faq_clientes.md"
+    },
+    {
+      "grupo": "cubierta",
+      "pregunta": "En mi extracto aparece una compra que yo no hice, ¿qué debo hacer?",
+      "cobertura_esperada": "total",
+      "documento_esperado": "faq_clientes.md"
+    },
+    {
+      "grupo": "cubierta",
+      "pregunta": "¿Cómo cancelo el seguro de vida que viene con la tarjeta?",
+      "cobertura_esperada": "total",
+      "documento_esperado": "faq_clientes.md"
+    },
+    {
+      "grupo": "cubierta",
+      "pregunta": "¿Por qué canales puedo presentar una queja o un reclamo al banco?",
+      "cobertura_esperada": "total",
+      "documento_esperado": "politica_y_contratos.md"
+    },
+    {
+      "grupo": "no cubierta",
+      "pregunta": "¿Cuál es la tasa de interés de un crédito hipotecario a 15 años?",
+      "cobertura_esperada": "ninguna",
+      "documento_esperado": null
+    },
+    {
+      "grupo": "no cubierta",
+      "pregunta": "¿En qué horario abre la oficina del centro los sábados?",
+      "cobertura_esperada": "ninguna",
+      "documento_esperado": null
+    },
+    {
+      "grupo": "no cubierta",
+      "pregunta": "¿Cuánto me cobran por sacar un avance en un cajero de otro banco?",
+      "cobertura_esperada": "ninguna",
+      "documento_esperado": null
+    },
+    {
+      "grupo": "ajena",
+      "pregunta": "¿Cuál es la receta del ajiaco santafereño?",
+      "cobertura_esperada": "ninguna",
+      "documento_esperado": null
+    },
+    {
+      "grupo": "ajena",
+      "pregunta": "Mi vecino tiene un perro que ladra toda la noche, ¿qué hago?",
+      "cobertura_esperada": "ninguna",
+      "documento_esperado": null
+    },
+    {
+      "grupo": "ajena",
+      "pregunta": "¿Va a llover mañana en Cali?",
+      "cobertura_esperada": "ninguna",
+      "documento_esperado": null
+    }
+  ]
+}
