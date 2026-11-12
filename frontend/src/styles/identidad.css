@@ -1,0 +1,116 @@
+/* Tokens de la identidad visual de PQRSD Coffee Devs.
+   Referencia y reglas de uso en docs/identidad-visual.md.
+   Las fuentes se cargan desde index.html. */
+
+:root {
+  /* Colores */
+  --color-papel: #fffdfa;
+  --color-tinta: #1c1917;
+  --color-grafito: #292524;
+  --color-nube: #f5f5f4;
+  --color-acero: #d6d3d1;
+  --color-pizarra: #78716c;
+  --color-carbon: #44403c;
+  --color-menta-senal: #8ff5dc;
+  --color-lima-aviso: #dff39b;
+  --color-lima-voltio: #c8ef5a;
+  --gradiente-barrido-senal: linear-gradient(90deg, #10c9b4 52%, #a8e01c 100%);
+
+  /* Semánticos: texto secundario sobre oscuro, errores y estado en línea */
+  --color-niebla: #a8a29e;
+  --color-alerta: #b42318;
+  --color-alerta-fondo: #fdeceb;
+  --color-en-linea: #0f766e;
+
+  /* Familias */
+  --fuente-display: 'Inter Tight', 'Arial Narrow', 'Helvetica Neue', sans-serif;
+  --fuente-interfaz: 'Inter', system-ui, Arial, sans-serif;
+  --fuente-mono: 'Chivo Mono', 'IBM Plex Mono', ui-monospace, monospace;
+  --fuente-codigo: 'Kode Mono', 'JetBrains Mono', ui-monospace, monospace;
+
+  /* Escala tipográfica */
+  --texto-nav: 14px;
+  --interlineado-nav: 1;
+  --tracking-nav: 0px;
+  --texto-cuerpo: 14px;
+  --interlineado-cuerpo: 1.4;
+  --tracking-cuerpo: -0.098px;
+  --texto-cuerpo-compacto: 14px;
+  --interlineado-cuerpo-compacto: 1.14;
+  --tracking-cuerpo-compacto: -0.14px;
+  --texto-boton: 14px;
+  --interlineado-boton: 1;
+  --tracking-boton: -0.14px;
+  --texto-etiqueta-tecnica: 14px;
+  --interlineado-etiqueta-tecnica: 1.5;
+  --tracking-etiqueta-tecnica: 0px;
+  --texto-encabezado: 32px;
+  --interlineado-encabezado: 1.2;
+  --tracking-encabezado: -0.96px;
+  --texto-cita: 32px;
+  --interlineado-cita: 1.3;
+  --tracking-cita: -1.28px;
+  --texto-display-seccion: 56px;
+  --interlineado-display-seccion: 1;
+  --tracking-display-seccion: -2.24px;
+  --texto-display-portada: 80px;
+  --interlineado-display-portada: 0.8;
+  --tracking-display-portada: -3.2px;
+
+  /* Lectura larga para el ciudadano: un paso más grande que el cuerpo compacto */
+  --texto-lectura: 16px;
+  --interlineado-lectura: 1.5;
+
+  /* Pesos */
+  --peso-regular: 400;
+  --peso-medio: 500;
+  --peso-seminegrita: 600;
+  --peso-negrita: 700;
+
+  /* Espaciado */
+  --espacio-4: 4px;
+  --espacio-8: 8px;
+  --espacio-10: 10px;
+  --espacio-12: 12px;
+  --espacio-16: 16px;
+  --espacio-22: 22px;
+  --espacio-24: 24px;
+  --espacio-30: 30px;
+  --espacio-32: 32px;
+  --espacio-40: 40px;
+  --espacio-48: 48px;
+  --espacio-56: 56px;
+  --espacio-72: 72px;
+  --espacio-88: 88px;
+  --espacio-112: 112px;
+  --espacio-120: 120px;
+
+  --espacio-secciones: 40px;
+  --relleno-tarjeta: 16px;
+  --espacio-elementos: 8px;
+
+  /* Radios */
+  --radio-enlaces: 4px;
+  --radio-botones: 12px;
+  --radio-tarjetas: 16px;
+  --radio-pildoras: 1000px;
+
+  /* Sombras y elevación */
+  --sombra-sutil: rgba(255, 255, 255, 0.13) 0 0 0 2px inset;
+  --sombra-sutil-2: rgba(255, 255, 255, 0.03) 0 0 0 1px inset;
+  --elevacion-tarjeta-nube: 0 0 0 1px rgba(0, 0, 0, 0.08), 0 0.6px 2.29px -1.25px rgba(0, 0, 0, 0.18), 0 2.29px 8.7px -2.5px rgba(0, 0, 0, 0.16), 0 10px 38px -3.75px rgba(0, 0, 0, 0.06);
+  --elevacion-tarjeta-grafito: 0 0.6px 2.53px -1.25px rgba(0, 0, 0, 0.18), 0 2.29px 9.61px -2.5px rgba(0, 0, 0, 0.16), 0 10px 42px -3.75px rgba(0, 0, 0, 0.06);
+  --elevacion-tarjeta-tecnica: 0 2.77px 2.21px rgba(0, 0, 0, 0.02), 0 6.65px 5.32px rgba(0, 0, 0, 0.03);
+
+  /* Superficies */
+  --superficie-lienzo: var(--color-papel);
+  --superficie-nube: var(--color-nube);
+  --superficie-panel: var(--color-grafito);
+  --superficie-franja: var(--color-tinta);
+
+  /* Movimiento */
+  --curva-salida: cubic-bezier(0.22, 1, 0.36, 1);
+  --duracion-corta: 160ms;
+  --duracion-media: 420ms;
+  --duracion-larga: 900ms;
+}
