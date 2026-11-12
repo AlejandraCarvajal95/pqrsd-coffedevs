@@ -45,6 +45,8 @@ Las dudas que la base de conocimiento resuelve no se radican; las demás se clas
 
 El ciudadano cuenta su situación en un chat. El agente responde con la base de conocimiento; si la duda se resuelve, no se radica nada (desvío). Si no, o si la persona decide continuar, el agente recoge los campos de la PQRSD (hechos, fechas, datos de contacto, producto o servicio), avisa qué falta y la radica. Para el avatar basta una ilustración fija o animada junto al chat.
 
+**Implementado (US-009, desvío):** `backend/app/pipeline/desvio.py` y `/api/chat`. Para buscar se usan los dos últimos mensajes del ciudadano. Si el RAG no supera el umbral, se responde un mensaje fijo sin llamar a Claude. Si hay contexto, el modelo liviano responde en JSON (`cobertura` y `respuesta`) citando los fragmentos con `[F#]`. Una respuesta sin citas válidas se reemplaza por el mensaje fijo. "Continuar con una PQRSD" solo sugiere asunto y descripción; la radicación la hará US-007/US-008. La tabla `consultas_desvio` permite medir la tasa de desvío (`GET /api/chat/metricas`). El historial de cada conversación vive en memoria del backend.
+
 ### **2\. Motor de plazos**
 
 Al radicar, calcula la fecha de vencimiento según el tipo de solicitud, en días hábiles y con festivos colombianos. Los plazos se guardan como configuración, no en el código. Antes de citar la Ley 1755 de 2015, el equipo debe verificar los plazos exactos por tipo (el reto menciona 15 días hábiles, pero la ley distingue otros términos para documentos y consultas).

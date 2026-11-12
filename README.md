@@ -44,6 +44,30 @@ Los embeddings se calculan con un modelo local (`fastembed`), que no gasta presu
 
 El gasto estimado en la API de Claude, total y por tarea, se consulta en http://localhost/api/costos. Desde `GASTO_ALERTA_USD` (30) el backend escribe una alerta en el log, y al llegar a `GASTO_TOPE_USD` (40) bloquea las llamadas.
 
+### Chat de desvío de consultas (US-009)
+
+Abre http://localhost/chat. El asistente responde solo con fragmentos de la base de conocimiento y muestra sus fuentes. Si no encuentra información suficiente, lo dice sin llamar a Claude y ofrece continuar con una PQRSD. Necesita el conocimiento cargado (paso anterior) y una `ANTHROPIC_API_KEY` real para las preguntas con contexto.
+
+| Endpoint | Qué hace |
+| --- | --- |
+| `POST /api/chat/consulta` | `{"sesion_id": null, "mensaje": "..."}`: responde con `respuesta`, `cobertura` (total, parcial o ninguna), `fuentes`, `ofrecer_radicar` y `pregunta_resuelto`. El primer mensaje devuelve el `sesion_id` que se reenvía después. |
+| `POST /api/chat/resultado` | `{"sesion_id", "resolvio": true}`: registra si se resolvió la duda. |
+| `POST /api/chat/continuar` | `{"sesion_id"}`: sugiere asunto y descripción de una PQRSD con lo conversado. No la crea. |
+| `GET /api/chat/metricas` | Consultas totales, con respuesta, sin contexto, resueltas sin radicar, que continuaron a PQRSD y tasa de desvío. |
+
+Prueba rápida desde la terminal:
+
+```bash
+curl -s -X POST localhost/api/chat/consulta -H 'Content-Type: application/json' \
+  -d '{"mensaje":"¿Cuánto cuesta la cuota de manejo?"}'
+```
+
+Para probar las 12 consultas de `data/ejemplos/consultas_desvio.json` contra la API real (gasta presupuesto: hasta 12 llamadas al modelo liviano):
+
+```bash
+python3 data/scripts/probar_desvio.py
+```
+
 ## Estructura
 
 ```
@@ -51,9 +75,10 @@ backend/            API FastAPI (Python 3.12)
   app/main.py       app, lifespan y rutas bajo /api
   app/config.py     variables de entorno (pydantic-settings)
   app/db.py         engine, sesión e inicialización del esquema
-  app/models/       tablas: pqrsd, borradores, revisiones, fragmentos_conocimiento
-  app/api/          endpoints de negocio (pendiente)
-  app/pipeline/     clasificador, RAG y generador (pendiente); prompts/ en .md
+  app/models/       tablas: pqrsd, borradores, revisiones, fragmentos_conocimiento,
+                    cache_embeddings_consulta, consumos_ia, consultas_desvio
+  app/api/          endpoints: costos y chat de desvío (los demás, pendientes)
+  app/pipeline/     RAG, costos y desvío; clasificador y generador pendientes; prompts/ en .md
 frontend/           React + Vite, servido por nginx en su contenedor
 nginx/nginx.conf    proxy: /api/ -> backend:8000, / -> frontend
 data/               conocimiento y ejemplos ficticios, scripts de carga
