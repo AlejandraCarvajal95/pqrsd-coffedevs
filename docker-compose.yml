@@ -4,6 +4,8 @@ services:
     env_file: .env
     volumes:
       - pgdata:/var/lib/postgresql/data
+    expose:
+      - "5432"   # solo red interna de compose, sin puerto en el host
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
@@ -14,13 +16,24 @@ services:
   backend:
     build: ./backend
     env_file: .env
+    expose:
+      - "8000"   # nginx lo alcanza como backend:8000
     depends_on:
       db:
         condition: service_healthy
+    healthcheck:
+      # La imagen slim no trae curl: se usa Python. Sano solo si la base responde.
+      test: ["CMD", "python", "-c", "import json,urllib.request,sys; r=json.load(urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=3)); sys.exit(0 if r.get('db') else 1)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     restart: unless-stopped
 
   frontend:
     build: ./frontend
+    expose:
+      - "80"
     restart: unless-stopped
 
   nginx:
@@ -31,8 +44,10 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
-      - backend
-      - frontend
+      backend:
+        condition: service_healthy
+      frontend:
+        condition: service_started
     restart: unless-stopped
 
 volumes:
