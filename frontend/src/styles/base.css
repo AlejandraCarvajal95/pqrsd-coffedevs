@@ -391,8 +391,8 @@ textarea.campo__control {
 
 .marca {
   display: inline-flex;
-  align-items: baseline;
-  gap: var(--espacio-8);
+  align-items: center;
+  gap: var(--espacio-10);
   min-height: 44px;
   padding-block: var(--espacio-10);
   font-family: var(--fuente-display);
@@ -401,6 +401,44 @@ textarea.campo__control {
   letter-spacing: -0.03em;
   line-height: 1.2;
   text-decoration: none;
+}
+
+.marca__nombre {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: var(--espacio-8);
+}
+
+.logo {
+  flex: none;
+  overflow: visible;
+}
+
+.logo__hoja {
+  fill: var(--color-papel);
+  stroke: var(--color-tinta);
+  stroke-width: 1.5;
+  transform-box: fill-box;
+  transform-origin: center;
+  rotate: -8deg;
+  transition:
+    rotate var(--duracion-media) var(--curva-salida),
+    translate var(--duracion-media) var(--curva-salida);
+}
+
+.logo__ficha {
+  fill: var(--color-tinta);
+}
+
+.logo__marca {
+  fill: var(--color-menta-senal);
+}
+
+/* Al pasar el cursor la hoja de atrás se abre, como las hojas del diagrama de portada. */
+.marca:hover .logo__hoja {
+  rotate: -16deg;
+  translate: -1.5px -1px;
 }
 
 .marca__sello {

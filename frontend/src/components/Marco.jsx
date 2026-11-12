@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { obtenerSalud } from '../services/api.js'
+import { Logo } from './Iconos.jsx'
 
 // Marco común de todas las páginas: franja de aviso, cabecera y pie.
 
@@ -52,8 +53,11 @@ export default function Marco({ children }) {
       <header className="cabecera">
         <div className="contenedor cabecera__fila">
           <Link to="/" className="marca">
-            Banco Andino Ficticio
-            <span className="marca__sello">PQRSD</span>
+            <Logo />
+            <span className="marca__nombre">
+              Banco Andino Ficticio
+              <span className="marca__sello">PQRSD</span>
+            </span>
           </Link>
           <nav className="navegacion" aria-label="Principal">
             <NavLink to="/chat" className="navegacion__enlace">Asistente virtual</NavLink>

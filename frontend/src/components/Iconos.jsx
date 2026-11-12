@@ -13,6 +13,19 @@ const BASE = {
   focusable: false,
 }
 
+// Logo: una hoja de solicitud, la ficha oscura del radicado encima y la marca
+// menta de "recibida". Es el mismo motivo del diagrama de portada, reducido.
+// El mismo dibujo está en public/logo.svg para el ícono de la pestaña.
+export function Logo({ tamano = 28 }) {
+  return (
+    <svg className="logo" width={tamano} height={tamano} viewBox="0 0 28 28" aria-hidden="true" focusable="false">
+      <rect className="logo__hoja" x="3" y="3" width="17" height="17" rx="4" />
+      <rect className="logo__ficha" x="9" y="9" width="16" height="16" rx="4" />
+      <rect className="logo__marca" x="13" y="17" width="4" height="4" rx="1" />
+    </svg>
+  )
+}
+
 export function IconoFlecha(props) {
   return (
     <svg {...BASE} className="icono-flecha" {...props}>
