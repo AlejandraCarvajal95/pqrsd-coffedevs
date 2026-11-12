@@ -7,6 +7,7 @@ acceso por roles. Solo expone cifras agregadas, nunca claves ni contenidos.
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
@@ -31,13 +32,28 @@ def resumen_de_gasto(sesion: Annotated[Session, Depends(obtener_sesion)]) -> dic
 
 
 def registrar_manejadores(app: FastAPI) -> None:
-    """Convierte los errores de costos e IA en respuestas JSON con mensaje claro."""
+    """Convierte los errores de costos, IA y validación en respuestas JSON con mensaje claro."""
 
     @app.exception_handler(LimiteExcedido)
     async def _limite_excedido(_: Request, error: LimiteExcedido) -> JSONResponse:
         estado = 413 if error.codigo == "entrada_larga" else 429
         return JSONResponse(
             status_code=estado, content={"detail": error.mensaje, "codigo": error.codigo}
+        )
+
+    @app.exception_handler(RequestValidationError)
+    async def _datos_invalidos(_: Request, error: RequestValidationError) -> JSONResponse:
+        # Sin el valor recibido: solo los nombres de los campos con error.
+        campos = sorted(
+            {".".join(str(p) for p in d["loc"] if p != "body") for d in error.errors()} - {""}
+        )
+        detalle = "Datos inválidos"
+        if "mensaje" in campos:
+            detalle = "El mensaje debe tener entre 1 y 1000 caracteres."
+        elif campos:
+            detalle = f"Datos inválidos en: {', '.join(campos)}."
+        return JSONResponse(
+            status_code=422, content={"detail": detalle, "codigo": "datos_invalidos"}
         )
 
     @app.exception_handler(ErrorIA)
