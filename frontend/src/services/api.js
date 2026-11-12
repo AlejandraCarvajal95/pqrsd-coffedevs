@@ -48,6 +48,12 @@ export function radicarPqrsd(datos) {
   return enviar('/pqrsd', datos)
 }
 
+// --- Estado de una PQRSD (US-010) ---
+
+export function consultarEstado(radicado) {
+  return solicitar(`/pqrsd/${encodeURIComponent(radicado.trim())}`)
+}
+
 // --- Chat de desvío (US-009) ---
 
 export function consultarChat(sesionId, mensaje) {
