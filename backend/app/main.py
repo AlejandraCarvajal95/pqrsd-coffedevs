@@ -10,6 +10,7 @@ from contextlib import asynccontextmanager
 from fastapi import APIRouter, FastAPI
 from fastapi.concurrency import run_in_threadpool
 
+from app.api import costos
 from app.db import base_disponible, inicializar_base_de_datos
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
@@ -40,4 +41,6 @@ def salud() -> dict:
     return {"estado": "ok", "db": base_disponible()}
 
 
+api.include_router(costos.router)
 app.include_router(api)
+costos.registrar_manejadores(app)

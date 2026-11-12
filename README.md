@@ -32,6 +32,18 @@ docker compose exec db psql -U pqrsd -d pqrsd
 
 (usa el usuario y la base que pusiste en `.env`). Para borrar todo y empezar de cero: `docker compose down -v`.
 
+### Cargar la base de conocimiento (RAG)
+
+Con los servicios arriba, carga `data/conocimiento/*.md` en pgvector:
+
+```bash
+docker compose run --rm backend python /data/scripts/cargar_conocimiento.py
+```
+
+Los embeddings se calculan con un modelo local (`fastembed`), que no gasta presupuesto de API. La primera vez el script descarga el modelo (unos 220 MB) al volumen `modelos`. Si lo vuelves a correr, no duplica fragmentos: solo recalcula los que cambiaron. Usa `--forzar` si cambias `EMBEDDING_MODELO` y `--eliminar-huerfanos` si borras un documento.
+
+El gasto estimado en la API de Claude, total y por tarea, se consulta en http://localhost/api/costos. Desde `GASTO_ALERTA_USD` (30) el backend escribe una alerta en el log, y al llegar a `GASTO_TOPE_USD` (40) bloquea las llamadas.
+
 ## Estructura
 
 ```

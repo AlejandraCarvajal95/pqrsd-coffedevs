@@ -22,6 +22,38 @@ def base_inicializada():
 
 
 @pytest.fixture
+def embedder_falso(monkeypatch):
+    """Reemplaza el modelo de embeddings por uno determinista (bolsa de palabras).
+
+    Textos con palabras en común quedan cerca; así las pruebas no descargan el
+    modelo real. Devuelve la lista de lotes recibidos para contar llamadas.
+    """
+    import hashlib
+    import re
+
+    from app.config import configuracion
+    from app.pipeline import embeddings
+
+    llamadas: list[list[str]] = []
+
+    def vector(texto: str) -> list[float]:
+        valores = [0.0] * configuracion.embedding_dim
+        for palabra in re.findall(r"\w{3,}", texto.lower()):
+            posicion = int(hashlib.md5(palabra.encode()).hexdigest(), 16)
+            valores[posicion % configuracion.embedding_dim] += 1.0
+        if not any(valores):
+            valores[0] = 1.0
+        return valores
+
+    def generar(textos: list[str]) -> list[list[float]]:
+        llamadas.append(list(textos))
+        return [vector(texto) for texto in textos]
+
+    monkeypatch.setattr(embeddings, "generar_embeddings", generar)
+    return llamadas
+
+
+@pytest.fixture
 def sesion(base_inicializada):
     """Sesión dentro de una transacción que se deshace al final: no deja datos."""
     from sqlalchemy.orm import Session

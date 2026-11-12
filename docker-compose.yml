@@ -16,6 +16,9 @@ services:
   backend:
     build: ./backend
     env_file: .env
+    volumes:
+      - modelos:/modelos        # modelo de embeddings descargado (EMBEDDING_CACHE_DIR)
+      - ./data:/data:ro         # conocimiento y scripts de carga
     expose:
       - "8000"   # nginx lo alcanza como backend:8000
     depends_on:
@@ -52,3 +55,4 @@ services:
 
 volumes:
   pgdata:
+  modelos:

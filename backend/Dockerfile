@@ -15,6 +15,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY app ./app
 
+# Caché del modelo de embeddings. Se monta como volumen en docker-compose;
+# crearla aquí con dueño app hace que el volumen nuevo herede ese dueño.
+RUN mkdir -p /modelos && chown app:app /modelos
+
 USER app
 
 EXPOSE 8000

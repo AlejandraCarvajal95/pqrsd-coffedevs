@@ -31,6 +31,28 @@ class Configuracion(BaseSettings):
     modelo_borrador: str | None = None  # solo para el borrador final
     app_env: str = "desarrollo"
 
+    # --- Embeddings (locales con fastembed: no consumen presupuesto de API) ---
+    # Debe producir vectores de EMBEDDING_DIM dimensiones. Si se cambia, recargar
+    # el conocimiento con --forzar.
+    embedding_modelo: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+    embedding_cache_dir: str | None = None  # dónde se guarda el modelo descargado
+
+    # --- RAG ---
+    rag_top_k: int = Field(default=4, gt=0, le=20)
+    # Similitud coseno mínima (0 a 1) para pasar un fragmento al generador. Calibrada
+    # con los documentos de la demo: lo relevante queda sobre 0.31 y lo ajeno bajo 0.28.
+    rag_umbral_similitud: float = Field(default=0.30, ge=0, le=1)
+
+    # --- Control de costos de IA (US-015) ---
+    max_mensajes_sesion: int = Field(default=12, gt=0)
+    gasto_alerta_usd: float = Field(default=30.0, gt=0)
+    gasto_tope_usd: float = Field(default=40.0, gt=0)  # al llegar aquí se bloquean las llamadas
+    # Precios en USD por millón de tokens. Deben corresponder a MODELO_LIGERO y MODELO_BORRADOR.
+    precio_ligero_entrada_usd_mtok: float = Field(default=0.10, ge=0)
+    precio_ligero_salida_usd_mtok: float = Field(default=0.50, ge=0)
+    precio_borrador_entrada_usd_mtok: float = Field(default=2.00, ge=0)
+    precio_borrador_salida_usd_mtok: float = Field(default=10.00, ge=0)
+
     @field_validator("anthropic_api_key", "db_url", mode="before")
     @classmethod
     def _no_vacia(cls, valor):
@@ -40,7 +62,7 @@ class Configuracion(BaseSettings):
             raise PydanticCustomError("missing", "variable vacía")
         return valor
 
-    @field_validator("modelo_ligero", "modelo_borrador", mode="before")
+    @field_validator("modelo_ligero", "modelo_borrador", "embedding_cache_dir", mode="before")
     @classmethod
     def _vacia_es_none(cls, valor):
         if isinstance(valor, str) and not valor.strip():
