@@ -16,7 +16,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.base import Base, enum_texto
 
 
-class AccionRevision(str, enum.Enum):
+class AccionRevision(enum.StrEnum):
     editado = "editado"
     aprobado = "aprobado"
     rechazado = "rechazado"
@@ -94,7 +94,7 @@ DDL_PROTEGER_TEXTO_ORIGINAL = (
     CREATE OR REPLACE FUNCTION proteger_texto_original() RETURNS trigger AS $$
     BEGIN
         IF NEW.texto_original IS DISTINCT FROM OLD.texto_original THEN
-            RAISE EXCEPTION 'texto_original de borradores no se puede modificar (borrador %)', OLD.id;
+            RAISE EXCEPTION 'texto_original no se puede modificar (borrador %)', OLD.id;
         END IF;
         RETURN NEW;
     END;
