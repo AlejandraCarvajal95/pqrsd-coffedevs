@@ -111,6 +111,27 @@ def test_radicado_repetido_se_reintenta(cliente, monkeypatch):
     assert respuesta.json()["radicado"] == "PQRSD-2026-ZZZZZZ"
 
 
+def test_la_sugerencia_del_chat_cabe_en_la_radicacion(cliente):
+    """La descripción que arma el chat de desvío nunca supera el máximo del endpoint."""
+    from app.api.pqrsd import MAX_DESCRIPCION
+    from app.pipeline import desvio
+
+    sesion_chat = desvio.SesionChat()
+    for numero in range(12):
+        sesion_chat.turnos.append(desvio.Turno(pregunta=f"{numero} " + "x" * 990))
+    sugerida = desvio.sugerir_radicacion(sesion_chat)
+    assert len(sugerida.descripcion) <= MAX_DESCRIPCION
+    assert sugerida.descripcion.endswith(desvio.LINEA_NO_RESUELTO)
+
+    http, _, _ = cliente
+    respuesta = http.post(
+        "/api/pqrsd",
+        json={**DATOS, "asunto": sugerida.asunto, "descripcion": sugerida.descripcion,
+              "canal": "chat"},
+    )
+    assert respuesta.status_code == 201
+
+
 def test_orquestador_no_falla_con_id_inexistente(sesion, monkeypatch):
     import contextlib
     import uuid
