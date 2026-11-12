@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
 import FormularioPqrsd from '../components/FormularioPqrsd.jsx'
+import { IconoAlerta, IconoEnviar, IconoFlecha } from '../components/Iconos.jsx'
 import {
   consultarChat,
   continuarConPqrsd,
@@ -13,31 +13,22 @@ import {
 
 const MAX_CARACTERES = 1000
 
-const estilos = {
-  pagina: { fontFamily: 'system-ui, sans-serif', maxWidth: 720, margin: '2rem auto', padding: '0 1rem', color: '#1a1a1a' },
-  historial: { display: 'flex', flexDirection: 'column', gap: '0.75rem', margin: '1rem 0', padding: 0, listStyle: 'none' },
-  ciudadano: { alignSelf: 'flex-end', background: '#e8f0fe', borderRadius: 8, padding: '0.6rem 0.9rem', maxWidth: '85%', whiteSpace: 'pre-wrap' },
-  asistente: { alignSelf: 'flex-start', background: '#f4f4f4', borderRadius: 8, padding: '0.6rem 0.9rem', maxWidth: '85%', whiteSpace: 'pre-wrap' },
-  fuentes: { fontSize: '0.85rem', color: '#444', marginTop: '0.5rem', paddingLeft: '1.1rem' },
-  acciones: { display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.6rem' },
-  boton: { padding: '0.5rem 0.9rem', borderRadius: 6, border: '1px solid #1a4fa0', background: '#1a4fa0', color: '#fff', cursor: 'pointer', fontSize: '0.95rem' },
-  botonSecundario: { padding: '0.5rem 0.9rem', borderRadius: 6, border: '1px solid #1a4fa0', background: '#fff', color: '#1a4fa0', cursor: 'pointer', fontSize: '0.95rem' },
-  error: { background: '#fdecea', color: '#8a1c1c', border: '1px solid #f5c2c0', borderRadius: 6, padding: '0.6rem 0.9rem' },
-  formulario: { display: 'flex', flexDirection: 'column', gap: '0.5rem' },
-  campo: { width: '100%', boxSizing: 'border-box', padding: '0.6rem', fontSize: '1rem', borderRadius: 6, border: '1px solid #999', fontFamily: 'inherit' },
-  tarjeta: { border: '1px solid #ccc', borderRadius: 8, padding: '1rem', marginTop: '1rem' },
-  nota: { fontSize: '0.85rem', color: '#555' },
-}
+// Tomadas de data/ejemplos/consultas_desvio.json (grupo "cubierta").
+const PREGUNTAS_DE_EJEMPLO = [
+  '¿Por qué me cobran cuota de manejo si no he usado la tarjeta este mes?',
+  '¿Me pueden reportar en una central de riesgo sin avisarme antes?',
+  'En mi extracto aparece una compra que yo no hice, ¿qué debo hacer?',
+]
 
 function Fuentes({ fuentes }) {
   if (!fuentes?.length) return null
   return (
-    <div>
-      <strong style={{ fontSize: '0.85rem' }}>Fuentes:</strong>
-      <ul style={estilos.fuentes}>
+    <div className="fuentes">
+      <p className="fuentes__titulo">Fuentes</p>
+      <ul>
         {fuentes.map((fuente) => (
-          <li key={fuente.etiqueta}>
-            [{fuente.etiqueta}] {fuente.documento} › {fuente.seccion}
+          <li key={fuente.etiqueta} className="etiqueta-tecnica">
+            <span className="fuentes__etiqueta">[{fuente.etiqueta}]</span> {fuente.documento} › {fuente.seccion}
           </li>
         ))}
       </ul>
@@ -45,12 +36,12 @@ function Fuentes({ fuentes }) {
   )
 }
 
-function RadicacionSugerida({ sugerida }) {
+function RadicacionSugerida({ sugerida, referencia }) {
   // Usa el formulario de US-007 con lo conversado; el ciudadano revisa y confirma.
   return (
-    <section style={estilos.tarjeta} aria-labelledby="titulo-pqrsd">
-      <h2 id="titulo-pqrsd" style={{ marginTop: 0, fontSize: '1.15rem' }}>Continuar con una PQRSD</h2>
-      <p>{sugerida.mensaje}</p>
+    <section ref={referencia} className="tarjeta tarjeta--tecnica chat__radicacion" aria-labelledby="titulo-pqrsd">
+      <h2 id="titulo-pqrsd" className="encabezado">Continuar con una PQRSD</h2>
+      <p className="texto-apoyo">{sugerida.mensaje}</p>
       <FormularioPqrsd
         canal="chat"
         valoresIniciales={{ asunto: sugerida.asunto, descripcion: sugerida.descripcion }}
@@ -68,18 +59,24 @@ export default function Chat() {
   const [mostrarContinuar, setMostrarContinuar] = useState(false)
   const [sugerida, setSugerida] = useState(null)
   const finRef = useRef(null)
+  const radicacionRef = useRef(null)
 
   useEffect(() => {
-    finRef.current?.scrollIntoView?.({ behavior: 'smooth' })
-  }, [mensajes, sugerida])
+    // Sin mensajes no se desplaza: la página abre arriba, en el título.
+    if (!mensajes.length) return
+    finRef.current?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' })
+  }, [mensajes, enviando])
+
+  useEffect(() => {
+    // Al abrirse el formulario sugerido, se lleva a su comienzo.
+    if (sugerida) radicacionRef.current?.scrollIntoView?.({ behavior: 'smooth', block: 'start' })
+  }, [sugerida])
 
   function actualizarUltimo(cambios) {
     setMensajes((previos) => previos.map((m, i) => (i === previos.length - 1 ? { ...m, ...cambios } : m)))
   }
 
-  async function enviarPregunta(evento) {
-    evento.preventDefault()
-    const pregunta = texto.trim()
+  async function preguntar(pregunta) {
     if (!pregunta || enviando) return
     setError(null)
     setEnviando(true)
@@ -105,6 +102,11 @@ export default function Chat() {
     }
   }
 
+  function enviarPregunta(evento) {
+    evento.preventDefault()
+    preguntar(texto.trim())
+  }
+
   async function marcarResultado(resolvio) {
     setError(null)
     try {
@@ -128,80 +130,115 @@ export default function Chat() {
   }
 
   const ultimo = mensajes[mensajes.length - 1]
+  const vacio = mensajes.length === 0
 
   return (
-    <main style={estilos.pagina}>
-      <p><Link to="/">Inicio</Link></p>
-      <h1 style={{ marginBottom: '0.25rem' }}>Asistente virtual</h1>
-      <p style={estilos.nota}>
+    <div className="contenedor contenedor--angosto pagina chat">
+      <h1 className="display-seccion pagina__titulo">Asistente virtual</h1>
+      <p className="pagina__bajada texto-apoyo">
         Resuelva sus dudas sobre productos y atención del banco. Las respuestas salen de la
-        información oficial del banco y muestran sus fuentes. No comparta datos sensibles como
-        su cédula, números de tarjeta o claves.
+        información oficial del banco y muestran sus fuentes. No comparta datos sensibles como su
+        cédula, números de tarjeta o claves.
       </p>
 
-      <ol style={estilos.historial} aria-live="polite" aria-label="Conversación">
-        {mensajes.map((mensaje, i) => (
-          <li key={i} style={mensaje.rol === 'ciudadano' ? estilos.ciudadano : estilos.asistente}>
-            <span style={{ position: 'absolute', left: -9999 }}>
-              {mensaje.rol === 'ciudadano' ? 'Usted dijo:' : 'El asistente respondió:'}
-            </span>
-            {mensaje.texto}
-            {mensaje.rol === 'asistente' && <Fuentes fuentes={mensaje.fuentes} />}
-            {mensaje.resultado === 'resuelta' && <p style={estilos.nota}>Gracias por confirmarlo.</p>}
-          </li>
-        ))}
-        {enviando && <li style={estilos.asistente}>Buscando en la base de conocimiento…</li>}
-      </ol>
+      <div className="tarjeta tarjeta--nube chat__panel">
+        {vacio && (
+          <div className="chat__vacio">
+            <p className="texto-enfasis">Aún no hay mensajes. Escriba su pregunta abajo o pruebe con una de estas:</p>
+            <ul className="chat__ejemplos">
+              {PREGUNTAS_DE_EJEMPLO.map((pregunta) => (
+                <li key={pregunta}>
+                  <button type="button" className="chat__ejemplo" onClick={() => preguntar(pregunta)}>
+                    {pregunta}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
-      {ultimo?.rol === 'asistente' && ultimo.preguntaResuelto && (
-        <div style={estilos.acciones} role="group" aria-label="¿Se resolvió su duda?">
-          <span>¿Se resolvió su duda?</span>
-          <button type="button" style={estilos.boton} onClick={() => marcarResultado(true)}>
-            Resolvió mi duda
-          </button>
-          <button type="button" style={estilos.botonSecundario} onClick={() => marcarResultado(false)}>
-            Necesito más ayuda
-          </button>
-        </div>
-      )}
+        <ol className="chat__historial" aria-live="polite" aria-label="Conversación">
+          {mensajes.map((mensaje, i) => (
+            <li key={i} className={`mensaje mensaje--${mensaje.rol}`}>
+              <span className="solo-lectores">
+                {mensaje.rol === 'ciudadano' ? 'Usted dijo:' : 'El asistente respondió:'}
+              </span>
+              {mensaje.texto}
+              {mensaje.rol === 'asistente' && <Fuentes fuentes={mensaje.fuentes} />}
+              {mensaje.resultado === 'resuelta' && (
+                <p className="mensaje__nota">Gracias por confirmarlo.</p>
+              )}
+            </li>
+          ))}
+          {enviando && (
+            <li className="mensaje mensaje--asistente mensaje--espera">
+              <span className="puntos" aria-hidden="true"><span /><span /><span /></span>
+              Buscando en la base de conocimiento…
+            </li>
+          )}
+        </ol>
 
-      {mostrarContinuar && sesionId && !sugerida && (
-        <div style={estilos.acciones}>
-          <button type="button" style={estilos.boton} onClick={continuar}>
-            Continuar con una PQRSD
-          </button>
-        </div>
-      )}
+        {ultimo?.rol === 'asistente' && ultimo.preguntaResuelto && (
+          <div className="chat__acciones" role="group" aria-label="¿Se resolvió su duda?">
+            <span className="chat__pregunta">¿Se resolvió su duda?</span>
+            <button type="button" className="boton boton--grafito" onClick={() => marcarResultado(true)}>
+              Resolvió mi duda
+            </button>
+            <button type="button" className="boton boton--linea" onClick={() => marcarResultado(false)}>
+              Necesito más ayuda
+            </button>
+          </div>
+        )}
 
-      {sugerida && <RadicacionSugerida sugerida={sugerida} />}
+        {mostrarContinuar && sesionId && !sugerida && (
+          <div className="chat__acciones">
+            <button type="button" className="boton boton--menta" onClick={continuar}>
+              Continuar con una PQRSD <IconoFlecha />
+            </button>
+          </div>
+        )}
 
-      {error && (
-        <p role="alert" style={{ ...estilos.error, marginTop: '1rem' }}>
-          {error}
-        </p>
-      )}
+        {error && (
+          <p role="alert" className="aviso-error">
+            <IconoAlerta />
+            <span>{error}</span>
+          </p>
+        )}
 
-      <form onSubmit={enviarPregunta} style={{ ...estilos.formulario, marginTop: '1rem' }}>
-        <label htmlFor="pregunta">Escriba su pregunta</label>
-        <textarea
-          id="pregunta"
-          style={{ ...estilos.campo, minHeight: 80 }}
-          value={texto}
-          maxLength={MAX_CARACTERES}
-          onChange={(e) => setTexto(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) enviarPregunta(e)
-          }}
-          disabled={enviando}
-        />
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={estilos.nota}>{texto.length}/{MAX_CARACTERES}</span>
-          <button type="submit" style={estilos.boton} disabled={enviando || !texto.trim()}>
-            {enviando ? 'Enviando…' : 'Enviar'}
-          </button>
-        </div>
-      </form>
-      <div ref={finRef} />
-    </main>
+        <form onSubmit={enviarPregunta} className="redactor">
+          <label htmlFor="pregunta" className="campo__etiqueta">Escriba su pregunta</label>
+          <div className="redactor__caja">
+            <textarea
+              id="pregunta"
+              className="redactor__texto"
+              rows={2}
+              value={texto}
+              maxLength={MAX_CARACTERES}
+              onChange={(e) => setTexto(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) enviarPregunta(e)
+              }}
+              disabled={enviando}
+              aria-describedby="pregunta-ayuda"
+            />
+            <button
+              type="submit"
+              className="boton boton--menta redactor__enviar"
+              disabled={enviando || !texto.trim()}
+            >
+              {enviando ? 'Enviando…' : 'Enviar'}
+              {!enviando && <IconoEnviar />}
+            </button>
+          </div>
+          <p id="pregunta-ayuda" className="campo__pie etiqueta-tecnica">
+            <span>Enter envía. Mayús + Enter hace un salto de línea.</span>
+            <span>{texto.length}/{MAX_CARACTERES}</span>
+          </p>
+        </form>
+        <div ref={finRef} />
+      </div>
+
+      {sugerida && <RadicacionSugerida sugerida={sugerida} referencia={radicacionRef} />}
+    </div>
   )
 }
