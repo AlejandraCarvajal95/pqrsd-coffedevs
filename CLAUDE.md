@@ -29,6 +29,7 @@ Guía para personas y asistentes de IA que trabajen en este repositorio.
 - Los nombres de modelo vienen de variables de entorno; nunca escritos en el código.
 - Los prompts viven en archivos `.md` dentro de `backend/app/pipeline/prompts/`, no como cadenas en el código.
 - **No inventar normas ni datos.** Las respuestas citan fragmentos recuperados por el RAG; si no hay soporte, se dice.
+- Chat de desvío (`pipeline/desvio.py`): responde solo con fragmentos citados (`[F#]`); sin contexto suficiente no llama a Claude y devuelve un mensaje fijo.
 - Presupuesto total de IA del evento: 40 USD. Registrar tokens de entrada y salida en `borradores`.
 
 ## Datos y secretos
