@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import FormularioPqrsd from '../components/FormularioPqrsd.jsx'
 import { IconoAlerta, IconoEnviar, IconoFlecha } from '../components/Iconos.jsx'
 import {
@@ -134,11 +135,16 @@ export default function Chat() {
 
   return (
     <div className="contenedor contenedor--angosto pagina chat">
-      <h1 className="display-seccion pagina__titulo">Asistente virtual</h1>
+      <h1 className="display-seccion pagina__titulo">Resolver una duda</h1>
       <p className="pagina__bajada texto-apoyo">
         Resuelva sus dudas sobre productos y atención del banco. Las respuestas salen de la
         información oficial del banco y muestran sus fuentes. No comparta datos sensibles como su
         cédula, números de tarjeta o claves.
+      </p>
+      <p className="pagina__bajada texto-apoyo">
+        ¿Quiere radicar en lugar de preguntar?{' '}
+        <Link className="enlace" to="/radicar/chat">Hágalo con el asistente</Link> o{' '}
+        <Link className="enlace" to="/radicar">por su cuenta con el formulario</Link>.
       </p>
 
       <div className="tarjeta tarjeta--nube chat__panel">
