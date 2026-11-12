@@ -38,6 +38,7 @@ MAX_TURNOS_SESION = 12
 TURNOS_PREVIOS_EN_PROMPT = 3
 LARGO_BUSQUEDA = 500
 LARGO_ASUNTO = 80
+LARGO_DESCRIPCION = 4000  # igual al máximo de POST /api/pqrsd
 
 MENSAJE_SIN_CONTEXTO = (
     "No encontré información suficiente en la base de conocimiento del banco para "
@@ -363,9 +364,10 @@ def sugerir_radicacion(sesion: SesionChat) -> RadicacionSugerida | None:
     if not mensajes:
         return None
     primero = sesion.primer_mensaje or mensajes[0]
-    lineas = [f"- {mensaje}" for mensaje in mensajes]
-    return RadicacionSugerida(
-        asunto=primero[:LARGO_ASUNTO],
-        descripcion="Mensajes del ciudadano en el chat:\n" + "\n".join(lineas)
-        + f"\n\n{LINEA_NO_RESUELTO}",
-    )
+    cuerpo = "Mensajes del ciudadano en el chat:\n" + "\n".join(f"- {m}" for m in mensajes)
+    cierre = f"\n\n{LINEA_NO_RESUELTO}"
+    # La radicación acepta hasta LARGO_DESCRIPCION caracteres: se recorta el cuerpo.
+    espacio = LARGO_DESCRIPCION - len(cierre)
+    if len(cuerpo) > espacio:
+        cuerpo = cuerpo[: espacio - 1].rstrip() + "…"
+    return RadicacionSugerida(asunto=primero[:LARGO_ASUNTO], descripcion=cuerpo + cierre)

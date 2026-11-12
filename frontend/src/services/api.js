@@ -3,9 +3,10 @@
 const BASE_API = '/api'
 
 export class ErrorApi extends Error {
-  constructor(mensaje, estado) {
+  constructor(mensaje, estado, campos = []) {
     super(mensaje)
     this.estado = estado
+    this.campos = campos // en errores 422: nombres de los campos inválidos
   }
 }
 
@@ -20,13 +21,15 @@ export async function solicitar(ruta, opciones = {}) {
   if (!respuesta.ok) {
     // El backend devuelve {"detail": "mensaje en español"} en sus errores.
     let mensaje = `Error ${respuesta.status} al consultar el servidor.`
+    let campos = []
     try {
       const cuerpo = await respuesta.json()
       if (typeof cuerpo.detail === 'string') mensaje = cuerpo.detail
+      if (Array.isArray(cuerpo.campos)) campos = cuerpo.campos
     } catch {
       // La respuesta no era JSON: se deja el mensaje genérico.
     }
-    throw new ErrorApi(mensaje, respuesta.status)
+    throw new ErrorApi(mensaje, respuesta.status, campos)
   }
   return respuesta.json()
 }
@@ -37,6 +40,12 @@ function enviar(ruta, cuerpo) {
 
 export function obtenerSalud() {
   return solicitar('/health')
+}
+
+// --- Radicación (US-007) ---
+
+export function radicarPqrsd(datos) {
+  return enviar('/pqrsd', datos)
 }
 
 // --- Chat de desvío (US-009) ---

@@ -44,6 +44,15 @@ Los embeddings se calculan con un modelo local (`fastembed`), que no gasta presu
 
 El gasto estimado en la API de Claude, total y por tarea, se consulta en http://localhost/api/costos. Desde `GASTO_ALERTA_USD` (30) el backend escribe una alerta en el log, y al llegar a `GASTO_TOPE_USD` (40) bloquea las llamadas.
 
+### Radicar una PQRSD (US-007)
+
+Abre http://localhost/radicar, o usa "Continuar con una PQRSD" desde el chat. El endpoint es `POST /api/pqrsd` con `nombre_ciudadano`, `contacto` (correo o teléfono, ficticios), `asunto`, `descripcion` (máximo 4000 caracteres) y `canal` (`formulario` o `chat`). Responde 201 con el radicado y deja la PQRSD en estado `recibida`. Luego dispara el pipeline de IA en segundo plano (`pipeline/orquestador.py`). Si falta un campo, responde 422 con los nombres en `campos` y no guarda nada.
+
+```bash
+curl -s -X POST localhost/api/pqrsd -H 'Content-Type: application/json' \
+  -d '{"nombre_ciudadano":"Ciudadana Ficticia","contacto":"ficticia@ejemplo.test","asunto":"Cobro doble","descripcion":"Me cobraron la cuota de manejo dos veces."}'
+```
+
 ### Chat de desvío de consultas (US-009)
 
 Abre http://localhost/chat. El asistente responde solo con fragmentos de la base de conocimiento y muestra sus fuentes. Si no encuentra información suficiente, lo dice sin llamar a Claude y ofrece continuar con una PQRSD. Necesita el conocimiento cargado (paso anterior) y una `ANTHROPIC_API_KEY` real para las preguntas con contexto.
