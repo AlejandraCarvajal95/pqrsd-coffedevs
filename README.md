@@ -53,6 +53,14 @@ curl -s -X POST localhost/api/pqrsd -H 'Content-Type: application/json' \
   -d '{"nombre_ciudadano":"Ciudadana Ficticia","contacto":"ficticia@ejemplo.test","asunto":"Cobro doble","descripcion":"Me cobraron la cuota de manejo dos veces."}'
 ```
 
+### Consultar el estado de una PQRSD (US-010)
+
+Abre http://localhost/estado e ingresa el radicado. El endpoint es `GET /api/pqrsd/{radicado}` y devuelve solo `radicado`, `estado` (`recibida`, `en_tramite` o `respondida`), `etiqueta`, `fecha_radicacion` y `fecha_vencimiento` (nula hasta que exista el cálculo de plazos). Un radicado inexistente da siempre el mismo 404 genérico, y cada IP puede hacer 20 consultas por minuto (después, 429).
+
+```bash
+curl -s localhost/api/pqrsd/PQRSD-2026-ABC234
+```
+
 ### Chat de radicación (US-008)
 
 Abre http://localhost/radicar/chat. El ciudadano cuenta su caso en lenguaje natural; el agente (modelo liviano, prompt en `pipeline/prompts/radicacion.md`) extrae los campos y pide los que faltan. Cuando están completos aparece un resumen y, al confirmarlo, se radica con el mismo flujo del formulario (`POST /api/pqrsd`, canal `chat`). Necesita una `ANTHROPIC_API_KEY` real.

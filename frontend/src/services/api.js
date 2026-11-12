@@ -58,6 +58,12 @@ export function confirmarRadicacionChat(sesionId) {
   return enviar('/chat/radicacion/confirmar', { sesion_id: sesionId })
 }
 
+// --- Estado de una PQRSD (US-010) ---
+
+export function consultarEstado(radicado) {
+  return solicitar(`/pqrsd/${encodeURIComponent(radicado.trim())}`)
+}
+
 // --- Chat de desvío (US-009) ---
 
 export function consultarChat(sesionId, mensaje) {
