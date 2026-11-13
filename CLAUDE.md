@@ -14,6 +14,12 @@ Guía para personas y asistentes de IA que trabajen en este repositorio.
 - `borradores.texto_original` es inmutable (trigger en la base). Las ediciones van a `texto_actual` y se registran en `revisiones` (usar `Borrador.editar`).
 - El radicado (`PQRSD-AAAA-XXXXXX`) es aleatorio y no consecutivo; al insertar, reintentar si hay `IntegrityError` por colisión.
 
+### Plazos y panel del equipo
+- Días hábiles, vencimiento y semáforo: siempre con `pipeline/dias_habiles.py` (festivos de Colombia calculados, hora de Colombia). No cuentes días a mano ni dupliques la lógica; plazos y umbrales vienen de la configuración.
+- El panel (`api/admin.py`, `api/bandeja.py`, `api/metricas.py`) exige sesión: todo endpoint interno nuevo se incluye con `Depends(admin.requerir_admin)`. Los endpoints del ciudadano no exponen clasificación, borradores ni datos de otras personas.
+- Solo `POST /api/bandeja/{radicado}/aprobar` deja una PQRSD en `respondida`. No se aprueba un texto con avisos del sistema, notas internas ni campos por completar.
+- Las credenciales de demostración del panel solo valen con `APP_ENV=desarrollo`; en el servidor se define `ADMIN_CLAVE` en `.env`.
+
 ### Sin Alembic (decisión consciente de hackathon)
 - El esquema se crea al arrancar con `Base.metadata.create_all` (solo crea lo que no existe; no altera tablas existentes).
 - Si cambias una columna o un enum: en desarrollo, `docker compose down -v && docker compose up --build` (borra los datos). En el servidor del evento, coordina con el equipo y aplica el `ALTER` a mano.

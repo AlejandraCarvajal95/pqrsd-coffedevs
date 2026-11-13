@@ -115,6 +115,53 @@ Para probar las 12 consultas de `data/ejemplos/consultas_desvio.json` contra la 
 python3 data/scripts/probar_desvio.py
 ```
 
+### Plazos, semáforo y vencimiento (US-016 y US-017)
+
+Al radicar se guarda `fecha_vencimiento`: el plazo se cuenta en días hábiles de Colombia (sin sábados, domingos ni festivos de la Ley Emiliani, calculados en `pipeline/dias_habiles.py`) desde el día hábil siguiente a la radicación. Al clasificar se recalcula con el plazo del tipo; si el tipo es dudoso se usa el más corto. El ciudadano ve la fecha en `/estado`.
+
+- `PLAZO_DIAS_HABILES` (15) es el plazo general y `PLAZOS_POR_TIPO` (JSON) permite uno distinto por tipo. Verifique los términos de la Ley 1755 de 2015 antes de cambiarlos: es una simplificación para la demo, no asesoría legal.
+- Semáforo: rojo con `SEMAFORO_ROJO_DIAS` (3) días hábiles o menos, o si ya venció; amarillo hasta `SEMAFORO_AMARILLO_DIAS` (7); verde con más.
+
+### Panel del equipo (US-017, US-019, US-020 y US-022)
+
+Abra http://localhost/admin (también hay un enlace "Panel del equipo" en el pie). Pide usuario y clave:
+
+- **En su máquina** (`APP_ENV=desarrollo` y `ADMIN_CLAVE=cambiar-esto`): usuario `admin`, clave `coffeedevs-demo`. La página de acceso las muestra.
+- **En el servidor del evento:** ponga `APP_ENV=evento` y una `ADMIN_CLAVE` propia en el `.env` del servidor (nunca en el repositorio). Sin clave propia y fuera de `desarrollo`, el panel queda cerrado. Tras cambiar `.env`: `docker compose up -d backend`.
+
+Qué trae el panel:
+
+- **Resumen:** activas, en rojo o vencidas, clasificaciones por revisar, respondidas y gasto de IA.
+- **Bandeja por vencimiento:** de la más urgente a la menos urgente, con semáforo, días hábiles restantes y filtros por semáforo, área, tipo, estado, riesgo de fraude y texto.
+- **Calendario:** qué PQRSD vencen cada día hábil de las próximas semanas, y las ya vencidas.
+- **Enviadas:** las respondidas, con quién las aprobó y cuándo.
+- **Descargar base (CSV):** todas las PQRSD, sin nombre ni contacto del ciudadano.
+- **Detalle de una PQRSD:** la solicitud, la clasificación (se puede confirmar o corregir; si no había borrador se manda a redactar), el borrador editable con sus avisos y las fuentes citadas con el fragmento exacto.
+
+Reglas de la aprobación: `texto_original` nunca cambia (las ediciones van a `texto_actual`); no se puede aprobar un texto con avisos del sistema, notas internas, campos `[COMPLETAR: …]` o la firma sin llenar; al aprobar, la PQRSD pasa a `respondida`, queda quién aprobó y cuándo, y la respuesta final se guarda sin las etiquetas `[F#]`. El envío al ciudadano es simulado: cambia lo que ve en `/estado`.
+
+Endpoints (todos piden `Authorization: Bearer <token>` salvo el acceso):
+
+| Endpoint | Para qué |
+| --- | --- |
+| `POST /api/admin/login` | Devuelve el token de la sesión (12 horas por defecto) |
+| `GET /api/bandeja` | Lista por urgencia con filtros |
+| `GET /api/bandeja/{radicado}` | Detalle, borrador y fuentes |
+| `PATCH /api/bandeja/{radicado}/clasificacion` | Confirmar o corregir tipo y área |
+| `POST /api/bandeja/{radicado}/borrador/generar` | Redactar el borrador si falta |
+| `PUT /api/bandeja/{radicado}/borrador` | Guardar la edición |
+| `POST /api/bandeja/{radicado}/aprobar` | Aprobar y marcar como respondida |
+| `GET /api/bandeja/exportar/csv` | Descargar la base en CSV |
+| `GET /api/metricas` | Resumen, distribuciones, calendario y gasto de IA |
+
+Pendiente de US-022: roles por área (hoy hay un solo usuario del equipo).
+
+### Antes de la demo en el servidor
+
+1. Cargue la base de conocimiento (`data/scripts/cargar_conocimiento.py`, ver arriba). Sin ella todos los borradores salen "sin contexto".
+2. Defina `APP_ENV=evento` y `ADMIN_CLAVE` en el `.env` del servidor.
+3. Si la base del servidor se creó antes de los últimos cambios del modelo, recréela (`docker compose down -v`, borra los datos) o agregue las columnas a mano: `create_all` no altera tablas existentes.
+
 ## Estructura
 
 ```
