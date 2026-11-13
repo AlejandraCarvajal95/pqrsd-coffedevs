@@ -78,6 +78,7 @@ export default function Marco({ children }) {
           </p>
           <div className="pie__lado">
             <EstadoSistema />
+            <Link className="enlace pie__enlace" to="/admin">Panel del equipo</Link>
             <a className="boton boton--lima" href="/api/docs">Documentación de la API</a>
           </div>
         </div>
