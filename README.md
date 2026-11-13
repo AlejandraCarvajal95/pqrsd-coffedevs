@@ -59,6 +59,19 @@ curl -s -X POST localhost/api/pqrsd -H 'Content-Type: application/json' \
   -d '{"nombre_ciudadano":"Ciudadana Ficticia","contacto":"ficticia@ejemplo.test","asunto":"Cobro doble","descripcion":"Me cobraron la cuota de manejo dos veces."}'
 ```
 
+Con la PQRSD ya `clasificada`, el pipeline redacta el borrador (US-012 y US-013, `pipeline/generador.py`). El RAG recupera los fragmentos de `data/conocimiento/` que superan `RAG_UMBRAL_SIMILITUD` y el modelo más capaz (`MODELO_BORRADOR`), con el prompt de `prompts/borrador_pqrsd.md`, escribe la carta citando cada afirmación con `[F1]`, `[F2]`… El borrador queda en la tabla `borradores` con sus citas y sus tokens, y la PQRSD pasa a `borrador_listo` para que una persona lo revise. Hay que cargar antes la base de conocimiento (ver arriba): sin ella todo borrador sale "sin contexto".
+
+- **Sin contexto suficiente:** el modelo recibe el aviso de que no hay fragmentos y el borrador empieza con `[AVISO AUTOMÁTICO DEL SISTEMA]`; no se cita ninguna norma.
+- **Citas:** las etiquetas que no corresponden a un fragmento recuperado se borran. Cada cita guardada lleva `etiqueta`, `fragmento_id`, `documento`, `seccion` y `similitud`.
+- **Si falla la API, el modelo declina o se agotó el presupuesto:** no se crea borrador y la PQRSD sigue `clasificada`. La clasificación se guarda antes de pedir el borrador, así que nunca se pierde.
+- **En revisión de clasificación** (`pendiente_revision_clasificacion`): no se genera borrador hasta que una persona confirme tipo y área.
+
+Para ver el borrador y sus citas:
+
+```bash
+docker compose exec db psql -U pqrsd -d pqrsd -c "select p.radicado, p.estado, b.modelo, b.tokens_entrada, b.tokens_salida, jsonb_array_length(b.citas) as citas from pqrsd p join borradores b on b.pqrsd_id = p.id order by b.creado_en desc limit 5"
+```
+
 ### Consultar el estado de una PQRSD (US-010)
 
 Abre http://localhost/estado e ingresa el radicado. El endpoint es `GET /api/pqrsd/{radicado}` y devuelve solo `radicado`, `estado` (`recibida`, `en_tramite` o `respondida`), `etiqueta`, `fecha_radicacion` y `fecha_vencimiento` (nula hasta que exista el cálculo de plazos). Un radicado inexistente da siempre el mismo 404 genérico, y cada IP puede hacer 20 consultas por minuto (después, 429).
