@@ -8,10 +8,10 @@ import logging
 import threading
 from contextlib import asynccontextmanager
 
-from fastapi import APIRouter, FastAPI
+from fastapi import APIRouter, Depends, FastAPI
 from fastapi.concurrency import run_in_threadpool
 
-from app.api import chat, chat_radicacion, costos, estado, pqrsd
+from app.api import admin, bandeja, chat, chat_radicacion, costos, estado, metricas, pqrsd
 from app.config import configuracion
 from app.db import base_disponible, inicializar_base_de_datos
 from app.pipeline import svm
@@ -52,5 +52,9 @@ api.include_router(chat.router)
 api.include_router(chat_radicacion.router)
 api.include_router(pqrsd.router)
 api.include_router(estado.router)
+# Panel administrativo (US-022): la bandeja y las métricas exigen sesión.
+api.include_router(admin.router)
+api.include_router(bandeja.router, dependencies=[Depends(admin.requerir_admin)])
+api.include_router(metricas.router, dependencies=[Depends(admin.requerir_admin)])
 app.include_router(api)
 costos.registrar_manejadores(app)
