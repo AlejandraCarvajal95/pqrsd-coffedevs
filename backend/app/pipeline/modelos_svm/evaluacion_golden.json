@@ -2,13 +2,13 @@
   "n": 59,
   "tipo": {
     "n": 57,
-    "exactitud_claude": 0.754,
-    "f1_macro_claude": 0.637,
+    "exactitud_claude": 0.789,
+    "f1_macro_claude": 0.671,
     "exactitud_svm": 0.632,
-    "exactitud_sin_revision": 0.778,
-    "casos_sin_revision": 36,
-    "errores_de_claude_atrapados_por_revision": 6,
-    "errores_de_claude": 14,
+    "exactitud_sin_revision": 0.784,
+    "casos_sin_revision": 37,
+    "errores_de_claude_atrapados_por_revision": 4,
+    "errores_de_claude": 12,
     "matriz_claude": {
       "clases": [
         "peticion",
@@ -47,18 +47,18 @@
           0
         ],
         [
-          1,
           0,
-          1,
           0,
-          7
+          0,
+          0,
+          9
         ]
       ]
     }
   },
   "area_banco": {
     "n": 36,
-    "exactitud_claude": 0.528,
+    "exactitud_claude": 0.5,
     "exactitud_svm": 0.556,
     "exactitud_final_hibrida": 0.611
   },
@@ -72,10 +72,9 @@
     "exactitud_svm": 0.593
   },
   "revision_humana": {
-    "porcentaje": 0.39,
+    "porcentaje": 0.373,
     "motivos": {
-      "tipo_discrepante": 1,
-      "baja_confianza": 15,
+      "baja_confianza": 16,
       "posible_fuera_de_competencia": 18
     }
   },
@@ -92,7 +91,9 @@
       "tema": "acuerdos_de_pago",
       "tema_pred": "acuerdos_de_pago",
       "revision": false,
-      "motivos": []
+      "motivos": [],
+      "confianza_claude": 0.9,
+      "origen_area": "coinciden"
     },
     {
       "id": "golden:cfpb:2349113",
@@ -106,7 +107,9 @@
       "tema": "cobranza",
       "tema_pred": "reporte_centrales_riesgo",
       "revision": false,
-      "motivos": []
+      "motivos": [],
+      "confianza_claude": 0.7,
+      "origen_area": "claude"
     },
     {
       "id": "golden:cfpb:3372148",
@@ -120,7 +123,9 @@
       "tema": "reporte_centrales_riesgo",
       "tema_pred": "reporte_centrales_riesgo",
       "revision": false,
-      "motivos": []
+      "motivos": [],
+      "confianza_claude": 0.93,
+      "origen_area": "coinciden"
     },
     {
       "id": "golden:cfpb:3170938",
@@ -134,7 +139,9 @@
       "tema": "saldo_paz_y_salvo",
       "tema_pred": "saldo_paz_y_salvo",
       "revision": false,
-      "motivos": []
+      "motivos": [],
+      "confianza_claude": 0.9,
+      "origen_area": "coinciden"
     },
     {
       "id": "golden:cfpb:3245367",
@@ -148,7 +155,9 @@
       "tema": "acuerdos_de_pago",
       "tema_pred": "acuerdos_de_pago",
       "revision": false,
-      "motivos": []
+      "motivos": [],
+      "confianza_claude": 0.87,
+      "origen_area": "coinciden"
     },
     {
       "id": "golden:cfpb:5004657",
@@ -162,7 +171,9 @@
       "tema": "cobranza",
       "tema_pred": "saldo_paz_y_salvo",
       "revision": false,
-      "motivos": []
+      "motivos": [],
+      "confianza_claude": 0.82,
+      "origen_area": "coinciden"
     },
     {
       "id": "golden:cfpb:2988567",
@@ -176,23 +187,25 @@
       "tema": "reporte_centrales_riesgo",
       "tema_pred": "reporte_centrales_riesgo",
       "revision": false,
-      "motivos": []
+      "motivos": [],
+      "confianza_claude": 0.75,
+      "origen_area": "coinciden"
     },
     {
       "id": "golden:cfpb:5404233",
       "tipo": "denuncia",
-      "tipo_claude": "reclamo",
+      "tipo_claude": "denuncia",
       "tipo_svm": "denuncia",
       "area": "cartera",
-      "area_claude": "cartera",
+      "area_claude": "juridica",
       "area_svm": "juridica",
       "area_final": "juridica",
       "tema": "saldo_paz_y_salvo",
       "tema_pred": "suplantacion_identidad",
-      "revision": true,
-      "motivos": [
-        "tipo_discrepante"
-      ]
+      "revision": false,
+      "motivos": [],
+      "confianza_claude": 0.72,
+      "origen_area": "coinciden"
     },
     {
       "id": "golden:cfpb:5323457",
@@ -206,7 +219,9 @@
       "tema": "acuerdos_de_pago",
       "tema_pred": "acuerdos_de_pago",
       "revision": false,
-      "motivos": []
+      "motivos": [],
+      "confianza_claude": 0.75,
+      "origen_area": "coinciden"
     },
     {
       "id": "golden:cfpb:4949807",
@@ -220,7 +235,9 @@
       "tema": "suplantacion_identidad",
       "tema_pred": "reporte_centrales_riesgo",
       "revision": false,
-      "motivos": []
+      "motivos": [],
+      "confianza_claude": 0.82,
+      "origen_area": "coinciden"
     },
     {
       "id": "golden:cfpb:5313513",
@@ -234,7 +251,9 @@
       "tema": "uso_indebido_datos",
       "tema_pred": "uso_indebido_datos",
       "revision": false,
-      "motivos": []
+      "motivos": [],
+      "confianza_claude": 0.7,
+      "origen_area": "coinciden"
     },
     {
       "id": "golden:cfpb:3012462",
@@ -248,7 +267,9 @@
       "tema": "suplantacion_identidad",
       "tema_pred": "suplantacion_identidad",
       "revision": false,
-      "motivos": []
+      "motivos": [],
+      "confianza_claude": 0.8,
+      "origen_area": "claude"
     },
     {
       "id": "golden:cfpb:5818481",
@@ -262,7 +283,9 @@
       "tema": "uso_indebido_datos",
       "tema_pred": "uso_indebido_datos",
       "revision": false,
-      "motivos": []
+      "motivos": [],
+      "confianza_claude": 0.75,
+      "origen_area": "svm"
     },
     {
       "id": "golden:cfpb:3895315",
@@ -276,7 +299,9 @@
       "tema": "suplantacion_identidad",
       "tema_pred": "reporte_centrales_riesgo",
       "revision": false,
-      "motivos": []
+      "motivos": [],
+      "confianza_claude": 0.85,
+      "origen_area": "coinciden"
     },
     {
       "id": "golden:cfpb:5852153",
@@ -290,7 +315,9 @@
       "tema": "uso_indebido_datos",
       "tema_pred": "suplantacion_identidad",
       "revision": false,
-      "motivos": []
+      "motivos": [],
+      "confianza_claude": 0.75,
+      "origen_area": "svm"
     },
     {
       "id": "golden:cfpb:3711435",
@@ -304,7 +331,9 @@
       "tema": "suplantacion_identidad",
       "tema_pred": "suplantacion_identidad",
       "revision": false,
-      "motivos": []
+      "motivos": [],
+      "confianza_claude": 0.82,
+      "origen_area": "coinciden"
     },
     {
       "id": "golden:cfpb:6196592",
@@ -318,7 +347,9 @@
       "tema": "uso_indebido_datos",
       "tema_pred": "uso_indebido_datos",
       "revision": false,
-      "motivos": []
+      "motivos": [],
+      "confianza_claude": 0.75,
+      "origen_area": "svm"
     },
     {
       "id": "golden:cfpb:2898832",
@@ -332,7 +363,9 @@
       "tema": "suplantacion_identidad",
       "tema_pred": "suplantacion_identidad",
       "revision": false,
-      "motivos": []
+      "motivos": [],
+      "confianza_claude": 0.8,
+      "origen_area": "svm"
     },
     {
       "id": "golden:cfpb:1362548",
@@ -346,7 +379,9 @@
       "tema": "vinculacion_no_autorizada",
       "tema_pred": null,
       "revision": false,
-      "motivos": []
+      "motivos": [],
+      "confianza_claude": 0.7,
+      "origen_area": "coinciden"
     },
     {
       "id": "golden:cfpb:2172964",
@@ -360,7 +395,9 @@
       "tema": "vinculacion_no_autorizada",
       "tema_pred": "transaccion_no_reconocida",
       "revision": false,
-      "motivos": []
+      "motivos": [],
+      "confianza_claude": 0.7,
+      "origen_area": "claude"
     },
     {
       "id": "golden:cfpb:2270623",
@@ -374,7 +411,9 @@
       "tema": "vinculacion_no_autorizada",
       "tema_pred": "transaccion_mal_aplicada",
       "revision": false,
-      "motivos": []
+      "motivos": [],
+      "confianza_claude": 0.8,
+      "origen_area": "coinciden"
     },
     {
       "id": "golden:cfpb:1436925",
@@ -388,7 +427,9 @@
       "tema": "vinculacion_no_autorizada",
       "tema_pred": "cobranza",
       "revision": false,
-      "motivos": []
+      "motivos": [],
+      "confianza_claude": 0.7,
+      "origen_area": "claude"
     },
     {
       "id": "golden:cfpb:1417464",
@@ -402,7 +443,9 @@
       "tema": "vinculacion_no_autorizada",
       "tema_pred": "transaccion_no_reconocida",
       "revision": false,
-      "motivos": []
+      "motivos": [],
+      "confianza_claude": 0.9,
+      "origen_area": "claude"
     },
     {
       "id": "golden:cfpb:1543735",
@@ -416,7 +459,9 @@
       "tema": "vinculacion_no_autorizada",
       "tema_pred": "suplantacion_identidad",
       "revision": false,
-      "motivos": []
+      "motivos": [],
+      "confianza_claude": 0.92,
+      "origen_area": "coinciden"
     },
     {
       "id": "golden:cfpb:1652061",
@@ -430,7 +475,9 @@
       "tema": "vinculacion_no_autorizada",
       "tema_pred": "cobranza",
       "revision": false,
-      "motivos": []
+      "motivos": [],
+      "confianza_claude": 0.8,
+      "origen_area": "coinciden"
     },
     {
       "id": "golden:cfpb:1843914",
@@ -444,7 +491,9 @@
       "tema": "vinculacion_no_autorizada",
       "tema_pred": "suplantacion_identidad",
       "revision": false,
-      "motivos": []
+      "motivos": [],
+      "confianza_claude": 0.85,
+      "origen_area": "claude"
     },
     {
       "id": "golden:cfpb:2009513",
@@ -458,7 +507,9 @@
       "tema": "vinculacion_no_autorizada",
       "tema_pred": "acuerdos_de_pago",
       "revision": false,
-      "motivos": []
+      "motivos": [],
+      "confianza_claude": 0.85,
+      "origen_area": "claude"
     },
     {
       "id": "golden:cfpb:3045108",
@@ -472,7 +523,9 @@
       "tema": "atencion_y_canales",
       "tema_pred": "entrega_activacion_bloqueo",
       "revision": false,
-      "motivos": []
+      "motivos": [],
+      "confianza_claude": 0.75,
+      "origen_area": "claude"
     },
     {
       "id": "golden:cfpb:1539161",
@@ -486,7 +539,9 @@
       "tema": "cancelacion",
       "tema_pred": "cancelacion",
       "revision": false,
-      "motivos": []
+      "motivos": [],
+      "confianza_claude": 0.92,
+      "origen_area": "claude"
     },
     {
       "id": "golden:cfpb:2173044",
@@ -500,7 +555,9 @@
       "tema": "cobros_comisiones_intereses",
       "tema_pred": "atencion_y_canales",
       "revision": false,
-      "motivos": []
+      "motivos": [],
+      "confianza_claude": 0.9,
+      "origen_area": "coinciden"
     },
     {
       "id": "golden:cfpb:3611974",
@@ -514,7 +571,9 @@
       "tema": "entrega_activacion_bloqueo",
       "tema_pred": "suplantacion_identidad",
       "revision": false,
-      "motivos": []
+      "motivos": [],
+      "confianza_claude": 0.7,
+      "origen_area": "coinciden"
     },
     {
       "id": "golden:cfpb:3277366",
@@ -528,7 +587,9 @@
       "tema": "pagos",
       "tema_pred": "pagos",
       "revision": false,
-      "motivos": []
+      "motivos": [],
+      "confianza_claude": 0.6,
+      "origen_area": "claude"
     },
     {
       "id": "golden:cfpb:6163277",
@@ -542,7 +603,9 @@
       "tema": "transaccion_mal_aplicada",
       "tema_pred": "acuerdos_de_pago",
       "revision": false,
-      "motivos": []
+      "motivos": [],
+      "confianza_claude": 0.7,
+      "origen_area": "claude"
     },
     {
       "id": "golden:cfpb:4490330",
@@ -556,7 +619,9 @@
       "tema": "transaccion_no_reconocida",
       "tema_pred": "transaccion_no_reconocida",
       "revision": false,
-      "motivos": []
+      "motivos": [],
+      "confianza_claude": 0.8,
+      "origen_area": "claude"
     },
     {
       "id": "golden:cfpb:4328546",
@@ -570,7 +635,9 @@
       "tema": "atencion_y_canales",
       "tema_pred": "reporte_centrales_riesgo",
       "revision": false,
-      "motivos": []
+      "motivos": [],
+      "confianza_claude": 0.72,
+      "origen_area": "claude"
     },
     {
       "id": "golden:cfpb:1835434",
@@ -584,7 +651,9 @@
       "tema": "cancelacion",
       "tema_pred": "cancelacion",
       "revision": false,
-      "motivos": []
+      "motivos": [],
+      "confianza_claude": 0.85,
+      "origen_area": "coinciden"
     },
     {
       "id": "golden:datos_gov_mindeporte:3747623389",
@@ -601,7 +670,9 @@
       "motivos": [
         "baja_confianza",
         "posible_fuera_de_competencia"
-      ]
+      ],
+      "confianza_claude": 0.35,
+      "origen_area": "claude"
     },
     {
       "id": "golden:datos_gov_mindeporte:1793427022",
@@ -618,7 +689,9 @@
       "motivos": [
         "baja_confianza",
         "posible_fuera_de_competencia"
-      ]
+      ],
+      "confianza_claude": 0.3,
+      "origen_area": "claude"
     },
     {
       "id": "golden:datos_gov_mindeporte:2541544353",
@@ -634,12 +707,14 @@
       "revision": true,
       "motivos": [
         "posible_fuera_de_competencia"
-      ]
+      ],
+      "confianza_claude": 0.6,
+      "origen_area": "claude"
     },
     {
       "id": "golden:datos_gov_mindeporte:5479180909",
       "tipo": "denuncia",
-      "tipo_claude": "peticion",
+      "tipo_claude": "denuncia",
       "tipo_svm": "reclamo",
       "area": "fuera_de_competencia",
       "area_claude": "juridica",
@@ -651,7 +726,9 @@
       "motivos": [
         "baja_confianza",
         "posible_fuera_de_competencia"
-      ]
+      ],
+      "confianza_claude": 0.4,
+      "origen_area": "claude"
     },
     {
       "id": "golden:datos_gov_mindeporte:9578082449",
@@ -667,7 +744,9 @@
       "revision": true,
       "motivos": [
         "posible_fuera_de_competencia"
-      ]
+      ],
+      "confianza_claude": 0.7,
+      "origen_area": "claude"
     },
     {
       "id": "golden:datos_gov_mindeporte:4594947416",
@@ -684,7 +763,9 @@
       "motivos": [
         "baja_confianza",
         "posible_fuera_de_competencia"
-      ]
+      ],
+      "confianza_claude": 0.3,
+      "origen_area": "claude"
     },
     {
       "id": "golden:datos_gov_mindeporte:6741087403",
@@ -700,7 +781,9 @@
       "revision": true,
       "motivos": [
         "posible_fuera_de_competencia"
-      ]
+      ],
+      "confianza_claude": 0.62,
+      "origen_area": "claude"
     },
     {
       "id": "golden:datos_gov_mindeporte:7773687303",
@@ -717,7 +800,9 @@
       "motivos": [
         "baja_confianza",
         "posible_fuera_de_competencia"
-      ]
+      ],
+      "confianza_claude": 0.2,
+      "origen_area": "claude"
     },
     {
       "id": "golden:datos_gov_mindeporte:1471083179",
@@ -734,7 +819,9 @@
       "motivos": [
         "baja_confianza",
         "posible_fuera_de_competencia"
-      ]
+      ],
+      "confianza_claude": 0.2,
+      "origen_area": "claude"
     },
     {
       "id": "golden:datos_gov_mindeporte:611080800",
@@ -750,7 +837,9 @@
       "revision": true,
       "motivos": [
         "baja_confianza"
-      ]
+      ],
+      "confianza_claude": 0.35,
+      "origen_area": "claude"
     },
     {
       "id": "golden:datos_gov_mindeporte:4136167876",
@@ -767,7 +856,9 @@
       "motivos": [
         "baja_confianza",
         "posible_fuera_de_competencia"
-      ]
+      ],
+      "confianza_claude": 0.4,
+      "origen_area": "claude"
     },
     {
       "id": "golden:datos_gov_mindeporte:571318959",
@@ -784,7 +875,9 @@
       "motivos": [
         "baja_confianza",
         "posible_fuera_de_competencia"
-      ]
+      ],
+      "confianza_claude": 0.2,
+      "origen_area": "claude"
     },
     {
       "id": "golden:datos_gov_mindeporte:6616734033",
@@ -801,7 +894,9 @@
       "motivos": [
         "baja_confianza",
         "posible_fuera_de_competencia"
-      ]
+      ],
+      "confianza_claude": 0.2,
+      "origen_area": "claude"
     },
     {
       "id": "golden:datos_gov_contraloria_valle:4707105727",
@@ -817,7 +912,9 @@
       "revision": true,
       "motivos": [
         "posible_fuera_de_competencia"
-      ]
+      ],
+      "confianza_claude": 0.6,
+      "origen_area": "claude"
     },
     {
       "id": "golden:datos_gov_contraloria_valle:7763551951",
@@ -832,8 +929,11 @@
       "tema_pred": "suplantacion_identidad",
       "revision": true,
       "motivos": [
+        "baja_confianza",
         "posible_fuera_de_competencia"
-      ]
+      ],
+      "confianza_claude": 0.35,
+      "origen_area": "claude"
     },
     {
       "id": "golden:datos_gov_contraloria_valle:7521370875",
@@ -849,7 +949,9 @@
       "revision": true,
       "motivos": [
         "posible_fuera_de_competencia"
-      ]
+      ],
+      "confianza_claude": 0.7,
+      "origen_area": "claude"
     },
     {
       "id": "golden:datos_gov_contraloria_valle:3013359316",
@@ -866,7 +968,9 @@
       "motivos": [
         "baja_confianza",
         "posible_fuera_de_competencia"
-      ]
+      ],
+      "confianza_claude": 0.4,
+      "origen_area": "claude"
     },
     {
       "id": "golden:datos_gov_contraloria_valle:988235076",
@@ -882,7 +986,9 @@
       "revision": true,
       "motivos": [
         "posible_fuera_de_competencia"
-      ]
+      ],
+      "confianza_claude": 0.7,
+      "origen_area": "claude"
     },
     {
       "id": "golden:amazon_es:5704210153",
@@ -898,7 +1004,9 @@
       "revision": true,
       "motivos": [
         "baja_confianza"
-      ]
+      ],
+      "confianza_claude": 0.1,
+      "origen_area": "coinciden"
     },
     {
       "id": "golden:amazon_es:8003130642",
@@ -914,7 +1022,9 @@
       "revision": true,
       "motivos": [
         "baja_confianza"
-      ]
+      ],
+      "confianza_claude": 0.3,
+      "origen_area": "coinciden"
     },
     {
       "id": "golden:amazon_es:5105182828",
@@ -930,7 +1040,9 @@
       "revision": true,
       "motivos": [
         "baja_confianza"
-      ]
+      ],
+      "confianza_claude": 0.3,
+      "origen_area": "claude"
     },
     {
       "id": "golden:amazon_es:9165829468",
@@ -947,7 +1059,9 @@
       "motivos": [
         "baja_confianza",
         "posible_fuera_de_competencia"
-      ]
+      ],
+      "confianza_claude": 0.2,
+      "origen_area": "claude"
     },
     {
       "id": "golden:amazon_es:1021539051",
@@ -961,7 +1075,9 @@
       "tema": null,
       "tema_pred": "transaccion_mal_aplicada",
       "revision": false,
-      "motivos": []
+      "motivos": [],
+      "confianza_claude": 0.7,
+      "origen_area": "coinciden"
     }
   ]
 }

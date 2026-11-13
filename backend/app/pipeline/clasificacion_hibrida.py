@@ -11,6 +11,8 @@ Reglas (umbrales medidos en el split de test, ver modelos_svm/metricas.md):
   motor de plazos debe usar el plazo más corto mientras una persona decide.
 - Área: si Claude y el SVM coinciden, se acepta. Si no, gana el SVM cuando su confianza
   es >= 0,8 (95 % de precisión); si no, queda la de Claude.
+- Seguros: si el texto nombra un seguro, una póliza o un siniestro (REGLA_SEGUROS), el área
+  es Seguros de Vida. En el golden set ninguno de los dos clasificadores lo lograba.
 - Fuera de competencia: si el SVM lo dice con confianza >= 0,8, va a revisión (posible
   traslado a otra entidad).
 - Confianza de Claude < 0,6: revisión humana.
@@ -20,6 +22,7 @@ Nunca se envía nada al ciudadano sin aprobación humana.
 """
 
 import logging
+import re
 
 from sqlalchemy.orm import Session
 
@@ -42,6 +45,20 @@ AREAS = {
     "juridica": "Jurídica",
 }
 ETIQUETA_DE_AREA = {v: k for k, v in AREAS.items()}
+
+# Regla de Seguros: en el golden set, las quejas por el seguro asociado a la tarjeta o al
+# crédito se iban a Tarjetas o Cartera (hablan del cobro en el extracto). Si el texto nombra
+# un seguro, una póliza o un siniestro, el área es Seguros de Vida. Se evita "seguro" suelto
+# porque también significa "estoy seguro".
+REGLA_SEGUROS = re.compile(
+    # Solo seguros del Banco: no "mi seguro" ni "la aseguradora" sueltos, que en el golden set
+    # se referían a seguros médicos dentro de quejas de cobranza (Cartera).
+    r"\b(p[óo]lizas? (de vida|del cr[ée]dito|de la tarjeta|de seguro)|siniestros?|"
+    r"seguros? (de vida|deudor(es)?|de (la|mi) (tarjeta|cr[ée]dito|deuda)|de deuda|de desempleo|"
+    r"de protecci[óo]n|asociados? (a|al)|que (nunca |no )?(autoric[ée]|ped[íi]|solicit[ée]))|"
+    r"prima (del|de|de mi) seguro|cobr\w* (adicional )?(por|de) (un|el) seguro)",
+    re.IGNORECASE,
+)
 
 # Motivos que mandan la PQRSD a revisión humana.
 TIPO_DISCREPANTE = "tipo_discrepante"
@@ -103,6 +120,10 @@ def complementar(sesion: Session, pqrsd: PQRSD, claude: Clasificacion | None) ->
             origen_area = "coinciden"
         elif area_svm.confianza >= UMBRAL_SVM_AREA:
             area_final, origen_area = AREAS[area_svm.etiqueta], "svm"
+    svm_dice_banco = area_svm is not None and area_svm.etiqueta != "fuera_de_competencia"
+    es_del_banco = area_final is not None or svm_dice_banco
+    if es_del_banco and area_final != AREAS["seguros"] and REGLA_SEGUROS.search(texto):
+        area_final, origen_area = AREAS["seguros"], "regla_seguros"
     pqrsd.area = area_final
 
     # --- Capas del SVM: tema (según el área final), sentimiento y fraude.

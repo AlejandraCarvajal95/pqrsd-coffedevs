@@ -55,6 +55,7 @@ def clasificar(texto: str) -> dict:
         "tema_pred": pqrsd.tema,
         "revision": pqrsd.estado == EstadoPQRSD.pendiente_revision_clasificacion,
         "motivos": detalle["motivos_revision"],
+        "origen_area": detalle.get("origen_area"),
     }
 
 
@@ -111,7 +112,8 @@ def main():
         "revision_humana": {"porcentaje": round(sum(f["revision"] for f in filas) / len(filas), 3),
                             "motivos": Counter(m for f in filas for m in f["motivos"])},
         "filas": [{k: f[k] for k in ("id", "tipo", "tipo_claude", "tipo_svm", "area", "area_claude",
-                                     "area_svm", "area_final", "tema", "tema_pred", "revision", "motivos")}
+                                     "area_svm", "area_final", "tema", "tema_pred", "revision", "motivos",
+                                     "confianza_claude", "origen_area")}
                   for f in filas],
     }
     return m
