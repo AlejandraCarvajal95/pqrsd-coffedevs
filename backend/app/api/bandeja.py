@@ -10,6 +10,10 @@
 texto_original nunca se modifica: las ediciones van a texto_actual con
 Borrador.editar y cada acción queda en `revisiones`. No se puede aprobar un
 texto que conserve avisos del sistema, notas internas o campos por completar.
+
+También aquí (US-021 y US-023): el chat para ajustar el borrador conversando
+(pipeline/chat_empleado.py) y el registro de aprendizajes del equipo como
+.md de la base de conocimiento (pipeline/retroalimentacion.py).
 """
 
 import csv
@@ -17,7 +21,7 @@ import io
 import re
 import uuid
 from datetime import UTC, datetime
-from typing import Annotated
+from typing import Annotated, Literal
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Response
 from pydantic import BaseModel, Field, field_validator
@@ -35,7 +39,13 @@ from app.models import (
     Revision,
     TipoPQRSD,
 )
-from app.pipeline import dias_habiles, generador, orquestador
+from app.pipeline import (
+    chat_empleado,
+    dias_habiles,
+    generador,
+    orquestador,
+    retroalimentacion,
+)
 from app.pipeline.clasificador import AREAS
 from app.pipeline.desvio import PATRON_ETIQUETA
 
@@ -533,3 +543,118 @@ def aprobar(
     pqrsd.estado = EstadoPQRSD.respondida
     sesion.commit()
     return _detalle(sesion, pqrsd)
+
+
+# ---------------------------------------------------------------------------
+# Chat del empleado para ajustar el borrador (US-021)
+# ---------------------------------------------------------------------------
+
+
+class TurnoChat(BaseModel):
+    rol: Literal["empleado", "asistente"]
+    texto: str = Field(max_length=6000)
+
+
+class EntradaChat(BaseModel):
+    mensaje: str = Field(min_length=1, max_length=1000)
+    # La conversación vive en el frontend y llega completa en cada turno.
+    historial: list[TurnoChat] = Field(default_factory=list, max_length=60)
+    # Lo que la persona tiene en el editor (puede tener cambios sin guardar).
+    borrador_actual: str | None = Field(default=None, max_length=MAX_BORRADOR)
+
+    @field_validator("mensaje")
+    @classmethod
+    def _con_texto(cls, valor: str) -> str:
+        if not valor.strip():
+            raise ValueError("no puede estar vacío")
+        return valor.strip()
+
+
+@router.post("/{radicado}/chat")
+def chat_del_empleado(
+    radicado: str, entrada: EntradaChat, sesion: SesionDB, _: UsuarioAdmin
+) -> dict:
+    """Un turno del chat: respuesta breve y, si aplica, la carta propuesta completa.
+
+    No cambia el texto del borrador: la persona decide si aplica la propuesta.
+    Los errores de costos e IA (límite de instrucciones, presupuesto, API) los
+    convierten en respuestas claras los manejadores de api/costos.py.
+    """
+    pqrsd = _buscar(sesion, radicado)
+    _exigir_abierta(pqrsd)
+    borrador = _borrador_vigente(sesion, pqrsd)
+    if borrador is None:
+        raise HTTPException(status_code=409, detail=MENSAJE_SIN_BORRADOR)
+
+    salida = chat_empleado.conversar(
+        sesion,
+        pqrsd,
+        borrador,
+        entrada.mensaje,
+        historial=[turno.model_dump() for turno in entrada.historial],
+        borrador_actual=entrada.borrador_actual,
+    )
+    sesion.commit()  # solo pudo cambiar borradores.citas (fuentes nuevas de la propuesta)
+    return {
+        "respuesta_asistente": salida.respuesta,
+        "borrador_propuesto": salida.borrador_propuesto,
+        "fuentes": salida.fuentes,
+        "mensajes_restantes": salida.mensajes_restantes,
+    }
+
+
+# ---------------------------------------------------------------------------
+# Aprendizajes del equipo en la base de conocimiento (US-023)
+# ---------------------------------------------------------------------------
+
+
+class EntradaRetroalimentacion(BaseModel):
+    titulo: str = Field(min_length=3, max_length=120)
+    contenido: str = Field(min_length=10, max_length=3000)
+    area: str | None = Field(default=None, max_length=120)
+
+    @field_validator("titulo", "contenido")
+    @classmethod
+    def _con_texto(cls, valor: str) -> str:
+        if not valor.strip():
+            raise ValueError("no puede estar vacío")
+        return valor.strip()
+
+    @field_validator("area")
+    @classmethod
+    def _area_valida(cls, valor: str | None) -> str | None:
+        if valor is None or not valor.strip():
+            return None
+        if valor not in AREAS:
+            raise ValueError("no es un área del banco")
+        return valor
+
+
+@router.post("/{radicado}/retroalimentacion", status_code=201)
+def guardar_retroalimentacion(
+    radicado: str, entrada: EntradaRetroalimentacion, sesion: SesionDB, usuario: UsuarioAdmin
+) -> dict:
+    """Guarda un criterio aprendido como .md y lo indexa de inmediato en pgvector.
+
+    Se puede usar durante la revisión o después de aprobar. No toca la PQRSD.
+    """
+    pqrsd = _buscar(sesion, radicado)
+    try:
+        aprendizaje = retroalimentacion.guardar_aprendizaje(
+            sesion,
+            radicado=pqrsd.radicado,
+            titulo=entrada.titulo,
+            contenido=entrada.contenido,
+            area=entrada.area or pqrsd.area,
+            autor=usuario,
+        )
+    except retroalimentacion.ErrorRetroalimentacion as error:
+        raise HTTPException(status_code=503, detail=str(error)) from None
+    sesion.commit()
+    return {
+        "archivo": aprendizaje.archivo,
+        "documento": aprendizaje.documento,
+        "fragmentos_indexados": aprendizaje.fragmentos_indexados,
+        "total_fragmentos": aprendizaje.total_fragmentos,
+        "mensaje": "Aprendizaje guardado. La base de conocimiento ya lo tiene disponible.",
+    }
