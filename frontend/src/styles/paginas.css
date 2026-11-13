@@ -1143,3 +1143,27 @@
   background: none;
   box-shadow: none;
 }
+
+/* Chat de radicación (US-008): resumen previo a confirmar y aviso de datos faltantes. */
+.resumen-chat {
+  display: grid;
+  gap: var(--espacio-16);
+  margin: var(--espacio-16) 0;
+}
+
+.resumen-chat dt {
+  color: var(--color-pizarra);
+}
+
+.resumen-chat dd {
+  margin: 2px 0 0;
+}
+
+.resumen-chat__descripcion {
+  white-space: pre-wrap;
+}
+
+.chat__pendiente {
+  margin: var(--espacio-16) 0 0;
+  color: var(--color-pizarra);
+}

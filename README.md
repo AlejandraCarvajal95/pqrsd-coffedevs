@@ -61,6 +61,17 @@ Abre http://localhost/estado e ingresa el radicado. El endpoint es `GET /api/pqr
 curl -s localhost/api/pqrsd/PQRSD-2026-ABC234
 ```
 
+### Chat de radicación (US-008)
+
+Abre http://localhost/radicar/chat. El ciudadano cuenta su caso en lenguaje natural; el agente (modelo liviano, prompt en `pipeline/prompts/radicacion.md`) extrae los campos y pide los que faltan. Cuando están completos aparece un resumen y, al confirmarlo, se radica con el mismo flujo del formulario (`POST /api/pqrsd`, canal `chat`). Necesita una `ANTHROPIC_API_KEY` real.
+
+| Endpoint | Qué hace |
+| --- | --- |
+| `POST /api/chat/radicacion/mensaje` | `{"sesion_id": null, "mensaje": "..."}`: responde con `respuesta`, `campos` extraídos, `faltantes`, `listo_para_confirmar`, `limite_alcanzado` y `resumen` (nombre, contacto, asunto y descripción). El primer mensaje devuelve el `sesion_id` que se reenvía después. |
+| `POST /api/chat/radicacion/confirmar` | `{"sesion_id"}`: radica la PQRSD y devuelve el radicado. 409 si faltan datos. Si se repite, devuelve el mismo radicado sin duplicar. |
+
+Obligatorios: nombre, contacto (correo o teléfono) y hechos; fecha, producto y asunto son opcionales (si no hay asunto se usa el inicio de los hechos). Qué falta lo decide el código, no el modelo. Al superar `MAX_MENSAJES_SESION` no se llama al modelo: si ya están los obligatorios se ofrece radicar con lo reunido, y si no, se pasa al formulario ya llenado.
+
 ### Chat de desvío de consultas (US-009)
 
 Abre http://localhost/chat. El asistente responde solo con fragmentos de la base de conocimiento y muestra sus fuentes. Si no encuentra información suficiente, lo dice sin llamar a Claude y ofrece continuar con una PQRSD. Necesita el conocimiento cargado (paso anterior) y una `ANTHROPIC_API_KEY` real para las preguntas con contexto.

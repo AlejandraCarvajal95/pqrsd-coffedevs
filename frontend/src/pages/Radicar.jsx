@@ -30,6 +30,10 @@ export default function Radicar() {
           ¿Solo tiene una duda? <Link className="enlace" to="/chat">Pregunte primero al asistente</Link>:
           puede que la resuelva sin radicar.
         </p>
+        <p className="texto-apoyo radicar__alterna">
+          ¿Prefiere contar su caso con sus palabras?{' '}
+          <Link className="enlace" to="/radicar/chat">Radique conversando con el asistente</Link>.
+        </p>
       </div>
       <div className="tarjeta tarjeta--tecnica radicar__formulario">
         <FormularioPqrsd canal="formulario" />
