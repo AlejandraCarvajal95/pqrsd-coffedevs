@@ -9,7 +9,7 @@ from sqlalchemy import select
 
 from app.config import configuracion
 from app.models import PQRSD, CanalPQRSD, ConsumoIA, EstadoPQRSD
-from app.pipeline import clasificador, costos, orquestador, svm
+from app.pipeline import clasificador, costos, generador, orquestador, svm
 from app.pipeline.costos import ErrorIA, LimiteExcedido
 
 VALIDA = json.dumps(
@@ -203,6 +203,8 @@ def test_el_orquestador_clasifica_la_pqrsd_radicada(entorno, monkeypatch):
     monkeypatch.setattr(svm, "predecir",
                         lambda capa, texto: svm.PrediccionCapa(falso[capa], 0.9, {}))
     monkeypatch.setattr(svm, "predecir_tema", lambda texto, area: None)
+    # Aquí solo se prueba la clasificación; el borrador se cubre en test_orquestador.py.
+    monkeypatch.setattr(generador, "generar_borrador", lambda sesion, pqrsd: None)
     pqrsd = _pqrsd(entorno.sesion)
     orquestador.procesar_pqrsd(pqrsd.id)
     entorno.sesion.refresh(pqrsd)
