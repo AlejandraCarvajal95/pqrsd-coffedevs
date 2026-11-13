@@ -56,6 +56,44 @@ class Configuracion(BaseSettings):
     precio_borrador_entrada_usd_mtok: float = Field(default=2.00, ge=0)
     precio_borrador_salida_usd_mtok: float = Field(default=10.00, ge=0)
 
+    # --- Plazos y semáforo (US-016 y US-017) ---
+    # Plazo general en días hábiles (el reto y la Ley 1755 de 2015 hablan de 15).
+    plazo_dias_habiles: int = Field(default=15, gt=0, le=90)
+    # Plazo distinto por tipo, en JSON: {"peticion": 15, "queja": 15}. Vacío = plazo general.
+    plazos_por_tipo: dict[str, int] = Field(default_factory=dict)
+    # Rojo: quedan estos días hábiles o menos (o ya venció). Amarillo: hasta estos días.
+    semaforo_rojo_dias: int = Field(default=3, ge=0)
+    semaforo_amarillo_dias: int = Field(default=7, ge=0)
+
+    # --- Panel administrativo (US-022) ---
+    admin_usuario: str = "admin"
+    # Sin clave (o con el marcador de .env.example): en APP_ENV=desarrollo se usan las
+    # credenciales de demostración; en cualquier otro entorno el panel queda cerrado.
+    admin_clave: SecretStr | None = None
+    admin_sesion_horas: int = Field(default=12, gt=0, le=72)
+
+    @field_validator("plazos_por_tipo", mode="before")
+    @classmethod
+    def _plazos_vacios(cls, valor):
+        if valor is None or (isinstance(valor, str) and not valor.strip()):
+            return {}
+        return valor
+
+    @field_validator("plazos_por_tipo")
+    @classmethod
+    def _plazos_positivos(cls, valor: dict[str, int]) -> dict[str, int]:
+        if any(dias <= 0 for dias in valor.values()):
+            raise ValueError("los plazos por tipo deben ser mayores que cero")
+        return valor
+
+    @field_validator("admin_clave", mode="before")
+    @classmethod
+    def _clave_sin_definir(cls, valor):
+        texto = valor.get_secret_value() if isinstance(valor, SecretStr) else valor
+        if texto is None or (isinstance(texto, str) and texto.strip() in ("", "cambiar-esto")):
+            return None
+        return valor
+
     @field_validator("anthropic_api_key", "db_url", mode="before")
     @classmethod
     def _no_vacia(cls, valor):

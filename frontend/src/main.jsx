@@ -5,6 +5,7 @@ import App from './App.jsx'
 import './styles/identidad.css'
 import './styles/base.css'
 import './styles/paginas.css'
+import './styles/admin.css'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

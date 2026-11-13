@@ -86,3 +86,117 @@ export function registrarResultadoChat(sesionId, resolvio) {
 export function continuarConPqrsd(sesionId) {
   return enviar('/chat/continuar', { sesion_id: sesionId })
 }
+
+// --- Panel administrativo (US-017, US-019, US-020, US-022) ---
+// El token vive en sessionStorage: se borra al cerrar la pestaña.
+
+const CLAVE_TOKEN = 'pqrsd_admin_token'
+
+export function tokenAdmin() {
+  try {
+    return sessionStorage.getItem(CLAVE_TOKEN)
+  } catch {
+    return null
+  }
+}
+
+export function cerrarSesionAdmin() {
+  try {
+    sessionStorage.removeItem(CLAVE_TOKEN)
+  } catch {
+    // Sin almacenamiento disponible no hay nada que borrar.
+  }
+}
+
+export function obtenerModoAdmin() {
+  return solicitar('/admin/modo')
+}
+
+export async function iniciarSesionAdmin(usuario, clave) {
+  const datos = await enviar('/admin/login', { usuario, clave })
+  sessionStorage.setItem(CLAVE_TOKEN, datos.token)
+  return datos
+}
+
+async function solicitarAdmin(ruta, opciones = {}) {
+  try {
+    return await solicitar(ruta, {
+      ...opciones,
+      headers: { ...(opciones.headers || {}), Authorization: `Bearer ${tokenAdmin() || ''}` },
+    })
+  } catch (error) {
+    // 401: la sesión venció o no existe. La página redirige al acceso.
+    if (error.estado === 401) cerrarSesionAdmin()
+    throw error
+  }
+}
+
+export function listarBandeja(filtros = {}) {
+  const parametros = new URLSearchParams()
+  for (const [clave, valor] of Object.entries(filtros)) {
+    if (valor !== '' && valor !== null && valor !== undefined) parametros.set(clave, valor)
+  }
+  const consulta = parametros.toString()
+  return solicitarAdmin(`/bandeja${consulta ? `?${consulta}` : ''}`)
+}
+
+export function obtenerMetricas() {
+  return solicitarAdmin('/metricas')
+}
+
+export function obtenerDetalleAdmin(radicado) {
+  return solicitarAdmin(`/bandeja/${encodeURIComponent(radicado)}`)
+}
+
+export function confirmarClasificacion(radicado, tipo, area) {
+  return solicitarAdmin(`/bandeja/${encodeURIComponent(radicado)}/clasificacion`, {
+    method: 'PATCH',
+    body: JSON.stringify({ tipo, area }),
+  })
+}
+
+export function pedirBorrador(radicado) {
+  return solicitarAdmin(`/bandeja/${encodeURIComponent(radicado)}/borrador/generar`, {
+    method: 'POST',
+  })
+}
+
+export function guardarBorrador(radicado, texto) {
+  return solicitarAdmin(`/bandeja/${encodeURIComponent(radicado)}/borrador`, {
+    method: 'PUT',
+    body: JSON.stringify({ texto }),
+  })
+}
+
+export function aprobarRespuesta(radicado, texto) {
+  return solicitarAdmin(`/bandeja/${encodeURIComponent(radicado)}/aprobar`, {
+    method: 'POST',
+    body: JSON.stringify({ texto }),
+  })
+}
+
+// Descarga el CSV con la sesión del panel (un enlace directo no llevaría el token).
+export async function descargarCsv() {
+  let respuesta
+  try {
+    respuesta = await fetch(`${BASE_API}/bandeja/exportar/csv`, {
+      headers: { Authorization: `Bearer ${tokenAdmin() || ''}` },
+    })
+  } catch {
+    throw new ErrorApi('No pudimos conectarnos con el servidor para descargar el archivo.', 0)
+  }
+  if (!respuesta.ok) {
+    if (respuesta.status === 401) cerrarSesionAdmin()
+    throw new ErrorApi('No se pudo descargar el archivo. Inicie sesión de nuevo.', respuesta.status)
+  }
+  const nombre =
+    /filename="([^"]+)"/.exec(respuesta.headers.get('Content-Disposition') || '')?.[1] ||
+    'pqrsd.csv'
+  const enlace = document.createElement('a')
+  enlace.href = URL.createObjectURL(await respuesta.blob())
+  enlace.download = nombre
+  document.body.appendChild(enlace)
+  enlace.click()
+  enlace.remove()
+  URL.revokeObjectURL(enlace.href)
+}

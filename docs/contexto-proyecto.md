@@ -65,18 +65,15 @@ Principio central: **la IA propone y una persona aprueba**. Nada sale al ciudada
 - **Pruebas:** 156 en verde. Verificado en Docker: radicar y clasificar tarda unos 6 s.
 
 ## 6. Qué falta (priorizado para la entrega)
-1. **Vencimiento en días hábiles** (US-016): `fecha_vencimiento` hoy queda nula. Debe excluir fines de semana y festivos de Colombia; plazos configurables (15 días hábiles según el reto, verificando la Ley 1755). Desbloquea el semáforo, el calendario y la fecha en `/estado`.
-2. **Borrador con Sonnet** (US-012 y US-013): `generador.py` está vacío. Conectar en el orquestador clasificar → RAG → generar el borrador con citas → guardarlo en `borradores` (con tokens) → estado `borrador_listo`. Si no hay contexto suficiente, lo dice y no inventa.
-3. **Panel admin** (US-017, US-019, US-020): `api/bandeja.py` y `api/metricas.py` están vacíos y no hay páginas. Debe tener:
-   - Lista por vencimiento y área, con semáforo y calendario.
-   - Detalle con el borrador y sus citas.
-   - Editar (con `Borrador.editar`, que conserva `texto_original`) y aprobar, que pasa la PQRSD a `respondida`.
-   - Necesita alguna protección de acceso antes de exponerlo (US-022: autenticación básica o usuarios ficticios).
-4. **Chatbot del empleado** (US-021), **ver enviadas** y **retroalimentación en `.md`** (US-023): guardar las correcciones aprobadas como documentos y recargar el conocimiento.
-5. **Descargar la BD:** exportación CSV desde el panel.
-6. **Cierre:**
+
+Ya hecho desde la primera versión de este documento: borrador con Sonnet y RAG (US-012 y US-013), vencimiento en días hábiles (US-016), semáforo (US-017), bandeja con calendario y enviadas (US-019), editor con aprobación (US-020), acceso al panel con usuario y clave (US-022, sin roles por área) y descarga de la base en CSV. Ver el README, secciones "Plazos, semáforo y vencimiento" y "Panel del equipo".
+
+1. **Chatbot del empleado** (US-021): pedir cambios al borrador en lenguaje natural desde el detalle.
+2. **Retroalimentación en `.md`** (US-023): guardar las correcciones aprobadas como documentos y recargar el conocimiento.
+3. **Roles por área** (resto de US-022) y alertas escalonadas (US-018), si alcanza el tiempo.
+4. **Cierre:**
    - `docs/demo.md` (vacío) con 3 casos ensayados y una grabación de respaldo.
-   - Despliegue en el servidor.
+   - Despliegue en el servidor: cargar el conocimiento, `APP_ENV=evento` y `ADMIN_CLAVE` propia.
    - PR de `develop` a `main` (`main` sigue en el commit inicial).
    - README con la tabla "quién hace qué".
 
