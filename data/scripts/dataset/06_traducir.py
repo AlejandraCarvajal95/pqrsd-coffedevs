@@ -55,7 +55,10 @@ EMPRESAS = [
                 r"Convergent|Enhanced Recovery|IC System|Jefferson Capital|Cavalry)\b", re.I), "la casa de cobranza"),
     (re.compile(r"\b(Synchrony( Bank)?( Pay Later)?|Capital ?One|Chase|JP ?Morgan|Citi(bank|group)?|Discover|"
                 r"Wells Fargo|Bank of America|American Express|Amex|Barclays|Comenity( Bank)?|Affirm|PayPal|"
-                r"Navient|Credit One|Merrick|Credit Karma|U\.?S\.? Bank|Klarna|Afterpay)\b", re.I), "el banco"),
+                r"Navient|Credit One|Merrick|Credit Karma|U\.?S\.? Bank|Klarna|Afterpay|HSBC|"
+                r"Santander|TD Bank|Ally( Bank)?|Sallie Mae|Nelnet|Goldman Sachs|Apple Card|"
+                r"Bread Financial|Mission Lane|OneMain|Truist|PNC|Regions|Fifth Third|Citizens Bank)\b",
+                re.I), "el banco"),
     (re.compile(r"\b(CFPB|Consumer Financial Protection Bureau)\b"), "la Superintendencia Financiera"),
 ]
 
