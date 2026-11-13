@@ -31,12 +31,14 @@ Guía para personas y asistentes de IA que trabajen en este repositorio.
 
 ## IA (Claude)
 - **La IA propone y una persona aprueba.** Nada se envía al ciudadano sin aprobación humana.
-- Modelo **liviano** (`MODELO_LIGERO`) para chat y clasificación; modelo **más capaz** (`MODELO_BORRADOR`) solo para el borrador final.
+- Modelo **liviano** (`MODELO_LIGERO`) para chat y clasificación; modelo **más capaz** (`MODELO_BORRADOR`) solo para el borrador final y su ajuste por chat.
 - Los nombres de modelo vienen de variables de entorno; nunca escritos en el código.
 - Los prompts viven en archivos `.md` dentro de `backend/app/pipeline/prompts/`, no como cadenas en el código.
 - **No inventar normas ni datos.** Las respuestas citan fragmentos recuperados por el RAG; si no hay soporte, se dice.
 - Los pasos del pipeline se encadenan en `pipeline/orquestador.py`, que corre en segundo plano al radicar. Si un paso de IA falla, la PQRSD queda para revisión humana; nunca se inventa un resultado.
 - Borrador (`pipeline/generador.py`, prompt `prompts/borrador_pqrsd.md`): solo para PQRSD `clasificada`. Cita con `[F#]` los fragmentos del RAG; las etiquetas sin fragmento se borran. Sin contexto, o sin citas, el borrador lleva un `[AVISO AUTOMÁTICO DEL SISTEMA]` para el analista. Si la API o el presupuesto fallan no se crea borrador y la PQRSD sigue `clasificada`. Al modelo no se le envía el contacto del ciudadano.
+- Chat del empleado (`pipeline/chat_empleado.py`, prompt `prompts/chat_empleado.md`, tarea `edicion` con `MODELO_BORRADOR`): propone la carta entre `<borrador_propuesto>`; nunca guarda el texto por su cuenta. Las etiquetas `[F#]` del borrador conservan su significado y las fuentes nuevas se numeran a continuación.
+- Aprendizajes (`pipeline/retroalimentacion.py`): `.md` en `data/conocimiento/retroalimentacion/` (nombre `retro_…` armado por el sistema) e indexación inmediata. `rag.recuperar(con_aprendizajes=True)` les reserva un lugar al redactar o ajustar borradores; el chat del ciudadano no lo usa.
 - Chat de desvío (`pipeline/desvio.py`): responde solo con fragmentos citados (`[F#]`); sin contexto suficiente no llama a Claude y devuelve un mensaje fijo.
 - Presupuesto total de IA del evento: 40 USD. Registrar tokens de entrada y salida en `borradores`.
 

@@ -160,7 +160,10 @@ def generar_borrador(sesion: Session, pqrsd: PQRSD) -> Borrador | None:
     en "borrador_listo". Devuelve None, sin tocar la PQRSD, si la API no
     responde, el modelo declina o se agotó el presupuesto.
     """
-    resultado = rag.recuperar(sesion, f"{pqrsd.asunto}\n{pqrsd.descripcion}")
+    # Incluye, si aplica, el aprendizaje del equipo más parecido (US-023).
+    resultado = rag.recuperar(
+        sesion, f"{pqrsd.asunto}\n{pqrsd.descripcion}", con_aprendizajes=True
+    )
     resultado = _ajustar_al_limite(pqrsd, resultado)
 
     try:

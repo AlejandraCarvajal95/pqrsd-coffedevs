@@ -66,16 +66,13 @@ Principio central: **la IA propone y una persona aprueba**. Nada sale al ciudada
 
 ## 6. Qué falta (priorizado para la entrega)
 
-Ya hecho desde la primera versión de este documento: borrador con Sonnet y RAG (US-012 y US-013), vencimiento en días hábiles (US-016), semáforo (US-017), bandeja con calendario y enviadas (US-019), editor con aprobación (US-020), acceso al panel con usuario y clave (US-022, sin roles por área) y descarga de la base en CSV. Ver el README, secciones "Plazos, semáforo y vencimiento" y "Panel del equipo".
+Ya está hecho todo el flujo del diagrama: borrador con Sonnet y RAG (US-012 y US-013), vencimiento en días hábiles (US-016), semáforo (US-017), bandeja con calendario y enviadas (US-019), editor con aprobación (US-020), chat del empleado para ajustar el borrador (US-021), acceso al panel (US-022, sin roles por área), aprendizajes del equipo en `.md` (US-023) y descarga de la base en CSV. Ver el README.
 
-1. **Chatbot del empleado** (US-021): pedir cambios al borrador en lenguaje natural desde el detalle.
-2. **Retroalimentación en `.md`** (US-023): guardar las correcciones aprobadas como documentos y recargar el conocimiento.
-3. **Roles por área** (resto de US-022) y alertas escalonadas (US-018), si alcanza el tiempo.
-4. **Cierre:**
-   - `docs/demo.md` (vacío) con 3 casos ensayados y una grabación de respaldo.
-   - Despliegue en el servidor: cargar el conocimiento, `APP_ENV=evento` y `ADMIN_CLAVE` propia.
-   - PR de `develop` a `main` (`main` sigue en el commit inicial).
-   - README con la tabla "quién hace qué".
+1. **Ensayo completo con la IA real** siguiendo `docs/demo.md`, y grabación de respaldo. El chat del empleado y los borradores se probaron con Claude simulado.
+2. **Despliegue en el servidor:** lista "Antes de la demo en el servidor" del README (clave del panel, permisos de la carpeta de aprendizajes y carga del conocimiento).
+3. **PR de `develop` a `main`** con la CI en verde.
+4. **README:** completar la columna "Persona" de la tabla "Quién hace qué".
+5. Si sobra tiempo: alertas escalonadas (US-018) y roles por área (resto de US-022).
 
 ## 7. Problemas conocidos
 - **Sin Alembic:** `create_all` no agrega columnas a tablas existentes. Tras cambios de modelo, usar `docker compose down -v` (borra los datos y el modelo descargado) o un `ALTER` a mano. Pasó con `tema`, `sentimiento`, `riesgo_fraude` y `clasificacion_detalle` en `pqrsd`.
