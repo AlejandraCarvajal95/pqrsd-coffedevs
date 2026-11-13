@@ -201,6 +201,45 @@ export async function descargarCsv() {
   URL.revokeObjectURL(enlace.href)
 }
 
+// Carta de respuesta en PDF (con el logo y el nombre del banco).
+// El ciudadano la abre con un enlace normal; el panel la pide con su token.
+export function urlRespuestaPdf(radicado, descargar = false) {
+  const ruta = `${BASE_API}/pqrsd/${encodeURIComponent(radicado)}/respuesta.pdf`
+  return descargar ? `${ruta}?descargar=true` : ruta
+}
+
+export async function respuestaPdfAdmin(radicado, descargar = false) {
+  // La pestaña se abre antes de esperar la respuesta: si no, el navegador la bloquea.
+  const pestana = descargar ? null : window.open('', '_blank')
+  let respuesta
+  try {
+    respuesta = await fetch(`${BASE_API}/bandeja/${encodeURIComponent(radicado)}/respuesta.pdf`, {
+      headers: { Authorization: `Bearer ${tokenAdmin() || ''}` },
+    })
+  } catch {
+    pestana?.close()
+    throw new ErrorApi('No pudimos conectarnos con el servidor para generar el PDF.', 0)
+  }
+  if (!respuesta.ok) {
+    pestana?.close()
+    if (respuesta.status === 401) cerrarSesionAdmin()
+    throw new ErrorApi('No se pudo generar el PDF de la respuesta.', respuesta.status)
+  }
+  const url = URL.createObjectURL(await respuesta.blob())
+  if (pestana) {
+    pestana.location.href = url
+  } else {
+    const enlace = document.createElement('a')
+    enlace.href = url
+    enlace.download = `respuesta-${radicado}.pdf`
+    document.body.appendChild(enlace)
+    enlace.click()
+    enlace.remove()
+  }
+  // Se libera después: la pestaña nueva necesita la URL mientras carga.
+  setTimeout(() => URL.revokeObjectURL(url), 60_000)
+}
+
 // --- Asistente de redacción y aprendizajes del equipo (US-021 y US-023) ---
 
 // cuerpo: { mensaje, historial: [{ rol, texto }], borrador_actual }

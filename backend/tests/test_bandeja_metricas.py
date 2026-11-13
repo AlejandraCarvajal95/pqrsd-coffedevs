@@ -579,3 +579,53 @@ def test_al_radicar_queda_la_fecha_de_vencimiento(panel, monkeypatch):
     # El ciudadano la ve en la consulta de estado.
     estado = http.get(f"/api/pqrsd/{datos['radicado']}").json()
     assert estado["fecha_vencimiento"] == esperado.isoformat()
+
+
+def test_respuesta_aprobada_se_descarga_en_pdf_en_el_panel_y_para_el_ciudadano(panel):
+    http, cabeceras, sesion = panel
+    pqrsd = _pqrsd(sesion, 2)
+    _borrador(sesion, pqrsd, texto=CARTA_CON_PENDIENTES)
+    ruta_panel = f"/api/bandeja/{pqrsd.radicado}/respuesta.pdf"
+    ruta_ciudadano = f"/api/pqrsd/{pqrsd.radicado}/respuesta.pdf"
+
+    # Antes de aprobar no hay carta: ni en el panel ni para el ciudadano.
+    assert http.get(ruta_panel, headers=cabeceras).status_code == 404
+    assert http.get(ruta_ciudadano).status_code == 404
+
+    final = "Señora Ciudadana: reversamos el cobro duplicado [F1]. Atentamente, Ana Ficticia."
+    http.post(f"/api/bandeja/{pqrsd.radicado}/aprobar", headers=cabeceras, json={"texto": final})
+
+    assert http.get(ruta_panel).status_code == 401  # el del panel exige sesión
+    for ruta, cab in ((ruta_panel, cabeceras), (ruta_ciudadano, {})):
+        en_linea = http.get(ruta, headers=cab)
+        assert en_linea.status_code == 200
+        assert en_linea.headers["content-type"] == "application/pdf"
+        assert en_linea.content.startswith(b"%PDF")
+        assert en_linea.headers["content-disposition"].startswith("inline;")
+        descarga = http.get(ruta, headers=cab, params={"descargar": True})
+        assert descarga.headers["content-disposition"] == (
+            f'attachment; filename="respuesta-{pqrsd.radicado}.pdf"'
+        )
+
+
+def test_el_pdf_lleva_el_banco_y_el_texto_final_sin_etiquetas():
+    import zlib
+    from datetime import UTC, datetime
+
+    from app.pdf_respuesta import generar_pdf_respuesta
+
+    contenido = generar_pdf_respuesta(
+        radicado="PQRSD-2026-ABC234",
+        fecha_respuesta=datetime(2026, 11, 13, 15, tzinfo=UTC),
+        texto="Señora Ciudadana: reversamos el cobro — en 5 días.\n\nAtentamente, Ana Ficticia.",
+    )
+    texto = b""
+    for bloque in contenido.split(b"stream")[1::2]:
+        try:
+            texto += zlib.decompress(bloque.strip(b"\r\n"))
+        except zlib.error:
+            texto += bloque
+    assert b"Banco Andino Ficticio" in texto
+    assert b"PQRSD-2026-ABC234" in texto
+    assert b"13 de noviembre de 2026" in texto
+    assert "reversamos el cobro - en 5 días.".encode("latin-1") in texto

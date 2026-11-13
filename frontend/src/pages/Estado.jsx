@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { IconoAlerta, IconoCheck, IconoFlecha } from '../components/Iconos.jsx'
-import { consultarEstado } from '../services/api.js'
+import { consultarEstado, urlRespuestaPdf } from '../services/api.js'
 
 // Página para que el ciudadano consulte el estado de su PQRSD (US-010).
-// Solo muestra estado y fechas; nunca borradores ni datos internos.
+// Solo muestra estado y fechas; nunca borradores ni datos internos. Cuando ya
+// está respondida, ofrece la carta aprobada en PDF.
 
 const ETAPAS = [
   { clave: 'recibida', etiqueta: 'Recibida', detalle: 'El banco tiene su solicitud.' },
@@ -79,6 +80,27 @@ function Resultado({ resultado }) {
           </dd>
         </div>
       </dl>
+
+      {resultado.estado === 'respondida' && (
+        <div className="estado__respuesta">
+          <p>
+            <strong>Su respuesta está lista.</strong> Es la carta que aprobó el banco, en PDF.
+          </p>
+          <div className="estado__respuesta-acciones">
+            <a
+              className="boton boton--menta"
+              href={urlRespuestaPdf(resultado.radicado)}
+              target="_blank"
+              rel="noopener"
+            >
+              Ver respuesta
+            </a>
+            <a className="boton boton--linea" href={urlRespuestaPdf(resultado.radicado, true)} download>
+              Descargar PDF
+            </a>
+          </div>
+        </div>
+      )}
     </section>
   )
 }

@@ -39,6 +39,7 @@ from app.models import (
     Revision,
     TipoPQRSD,
 )
+from app.pdf_respuesta import respuesta_aprobada, respuesta_pdf
 from app.pipeline import (
     chat_empleado,
     dias_habiles,
@@ -492,6 +493,20 @@ def generar_borrador(
         raise HTTPException(status_code=409, detail="Esta PQRSD ya tiene un borrador.")
     tareas.add_task(orquestador.redactar_borrador, pqrsd.id)
     return {"radicado": pqrsd.radicado, "borrador_en_proceso": True}
+
+
+@router.get("/{radicado}/respuesta.pdf")
+def respuesta_en_pdf(
+    radicado: str, sesion: SesionDB, _: UsuarioAdmin, descargar: bool = False
+) -> Response:
+    """La carta aprobada en PDF, igual a la que descarga el ciudadano."""
+    pqrsd = _buscar(sesion, radicado)
+    aprobada = respuesta_aprobada(sesion, pqrsd)
+    if pqrsd.estado != EstadoPQRSD.respondida or aprobada is None:
+        raise HTTPException(
+            status_code=404, detail="Esta PQRSD todavía no tiene una respuesta aprobada."
+        )
+    return respuesta_pdf(pqrsd, aprobada, descargar)
 
 
 @router.put("/{radicado}/borrador")
