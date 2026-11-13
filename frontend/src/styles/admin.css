@@ -37,8 +37,41 @@
   gap: var(--espacio-8);
 }
 
+/* Contenedor de la vista: la tabla decide entre columnas y fichas según este ancho. */
 .admin__vista {
   margin-top: var(--espacio-24);
+  container-type: inline-size;
+}
+
+.admin__cuerpo {
+  display: grid;
+  gap: var(--espacio-32);
+}
+
+.admin__principal {
+  min-width: 0;
+}
+
+.admin__lateral .vacio {
+  margin-top: 0;
+}
+
+/* Pantallas anchas: resumen en columna a la izquierda, fijo al desplazar; la bandeja a la derecha. */
+@media (min-width: 1080px) {
+  .admin--amplio {
+    max-width: 1400px;
+  }
+
+  .admin__cuerpo {
+    grid-template-columns: 264px minmax(0, 1fr);
+    gap: var(--espacio-24);
+    align-items: start;
+  }
+
+  .admin__lateral {
+    position: sticky;
+    top: 88px; /* debajo de la cabecera fija */
+  }
 }
 
 .vacio {
@@ -230,16 +263,16 @@
   padding: 0;
   list-style: none;
   overflow: hidden;
-  background: var(--color-acero); /* se ve entre celdas: son las líneas divisorias */
+  background: #4a4541; /* se ve entre celdas: son las líneas divisorias */
   border-radius: var(--radio-tarjetas);
-  box-shadow:
-    0 0 0 1px var(--color-acero),
-    var(--elevacion-tarjeta-tecnica);
+  box-shadow: var(--elevacion-tarjeta-grafito);
 }
 
+/* Resumen en negro y menta: cifras claras sobre grafito y el gasto de IA en menta. */
 .resumen__celda {
   display: flex;
-  background: #fff;
+  background: var(--superficie-panel);
+  color: #fff;
 }
 
 .resumen__atajo,
@@ -260,20 +293,20 @@
 }
 
 .resumen__atajo:hover {
-  background: var(--color-nube);
+  background: var(--color-tinta);
 }
 
 .resumen__atajo:hover .resumen__nombre {
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  color: var(--color-menta-senal);
 }
 
 .resumen__atajo:focus-visible {
   outline-offset: -3px;
 }
 
+/* El rojo del semáforo no contrasta sobre grafito: aquí va un rojo claro (8:1). */
 .resumen__atajo[data-alerta='true'] .resumen__cifra {
-  color: var(--semaforo-rojo);
+  color: #ffa69a;
 }
 
 .resumen__cifra {
@@ -291,17 +324,17 @@
 
 .resumen__nota {
   font-size: 13px;
-  color: var(--color-pizarra);
+  color: var(--color-niebla);
 }
 
 .resumen__gasto {
   grid-column: 1 / -1;
-  background: var(--superficie-panel);
-  color: #fff;
+  background: var(--color-menta-senal);
+  color: var(--color-tinta);
 }
 
 .resumen__gasto .resumen__nota {
-  color: var(--color-niebla);
+  color: var(--color-carbon);
 }
 
 /* Mientras ocupa todo el ancho va en franja: cifra a la izquierda, barra a la derecha. */
@@ -331,7 +364,7 @@
   display: block;
   height: 6px;
   margin: var(--espacio-4) 0;
-  background: rgba(255, 255, 255, 0.16);
+  background: rgba(28, 25, 23, 0.18);
   border-radius: var(--radio-pildoras);
   overflow: hidden;
 }
@@ -340,7 +373,7 @@
   display: block;
   height: 100%;
   min-width: 2px;
-  background: var(--gradiente-barrido-senal);
+  background: var(--color-tinta);
   border-radius: inherit;
 }
 
@@ -352,11 +385,7 @@
 
 @media (min-width: 1080px) {
   .resumen {
-    grid-template-columns: repeat(4, minmax(0, 1fr)) minmax(0, 1.25fr);
-  }
-
-  .resumen__gasto {
-    grid-column: auto;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -366,7 +395,6 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--espacio-4);
-  margin-top: var(--espacio-32);
   border-bottom: 1px solid var(--color-acero);
 }
 
@@ -406,24 +434,30 @@
   color: var(--color-carbon);
 }
 
-/* --- Filtros --- */
-
-.filtros {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  gap: var(--espacio-12);
+.pestanas__boton[aria-selected='true'] .pestanas__conteo {
+  background: var(--color-menta-senal);
+  color: var(--color-tinta);
 }
 
-.filtros__buscar {
-  flex: 1 1 240px;
+/* --- Filtros --- */
+
+/* Buscador arriba y selectores debajo; si la columna es ancha, todo en una línea. */
+.filtros {
+  display: grid;
+  align-items: end;
+  gap: var(--espacio-12);
 }
 
 .filtros__selectores {
-  flex: 3 1 600px;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: var(--espacio-12);
+}
+
+@container (min-width: 960px) {
+  .filtros {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 10fr);
+  }
 }
 
 .filtros__etiqueta {
@@ -1050,8 +1084,12 @@ textarea.editor {
     height: 46px;
   }
 
+  .filtros {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
   .filtros__selectores {
-    flex-basis: 100%;
+    grid-column: 1 / -1;
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -1090,8 +1128,8 @@ textarea.editor {
   }
 }
 
-@media (max-width: 959px) {
-  /* La tabla pasa a fichas (teléfono y tableta): sin desplazamiento horizontal. */
+@container (max-width: 859px) {
+  /* La tabla pasa a fichas cuando su columna es angosta: sin desplazamiento horizontal. */
   .tabla {
     min-width: 0;
   }
