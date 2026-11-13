@@ -591,7 +591,7 @@ def chat_del_empleado(
 ) -> dict:
     """Un turno del chat: respuesta breve y, si aplica, la carta propuesta completa.
 
-    No cambia el texto del borrador: la persona decide si aplica la propuesta.
+    No guarda nada: el panel aplica la propuesta con PUT borrador y se puede deshacer.
     Los errores de costos e IA (límite de instrucciones, presupuesto, API) los
     convierten en respuestas claras los manejadores de api/costos.py.
     """

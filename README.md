@@ -80,6 +80,12 @@ Abre http://localhost/estado e ingresa el radicado. El endpoint es `GET /api/pqr
 curl -s localhost/api/pqrsd/PQRSD-2026-ABC234
 ```
 
+Cuando la PQRSD está `respondida`, la página muestra "Ver respuesta" y "Descargar PDF". El endpoint es `GET /api/pqrsd/{radicado}/respuesta.pdf` (con `?descargar=true` baja como archivo). El PDF es una carta con el logo y el nombre del banco, el radicado, la fecha de respuesta y el texto que aprobó una persona, sin etiquetas `[F#]`. Si no hay respuesta aprobada, da el mismo 404 genérico y comparte el límite de 20 consultas por minuto.
+
+```bash
+curl -s -o respuesta.pdf "localhost/api/pqrsd/PQRSD-2026-ABC234/respuesta.pdf?descargar=true"
+```
+
 ### Chat de radicación (US-008)
 
 Abre http://localhost/radicar/chat. El ciudadano cuenta su caso en lenguaje natural; el agente (modelo liviano, prompt en `pipeline/prompts/radicacion.md`) extrae los campos y pide los que faltan. Cuando están completos aparece un resumen y, al confirmarlo, se radica con el mismo flujo del formulario (`POST /api/pqrsd`, canal `chat`). Necesita una `ANTHROPIC_API_KEY` real.
@@ -136,7 +142,8 @@ Qué trae el panel:
 - **Calendario:** qué PQRSD vencen cada día hábil de las próximas semanas, y las ya vencidas.
 - **Enviadas:** las respondidas, con quién las aprobó y cuándo.
 - **Descargar base (CSV):** todas las PQRSD, sin nombre ni contacto del ciudadano.
-- **Detalle de una PQRSD:** la solicitud, la clasificación (se puede confirmar o corregir; si no había borrador se manda a redactar), el borrador editable con sus avisos y las fuentes citadas con el fragmento exacto.
+- **Detalle de una PQRSD:** al estilo de un asistente de IA, con el chat a la izquierda y el documento a la derecha. La persona pide cambios con sus palabras ("más empático", "explica los plazos"…) y la carta que propone el asistente se aplica y se guarda sola en el documento; el último cambio se puede deshacer. El documento también se edita a mano, y "Restaurar original" vuelve al texto de la IA. La solicitud, la clasificación (se puede confirmar o corregir; si no había borrador se manda a redactar), los aprendizajes y el historial están en "Detalles del caso". Las fuentes citadas, con el fragmento exacto, van bajo el documento. En pantallas angostas se ve un panel a la vez.
+- **Respuesta en PDF:** una vez aprobada, "Ver PDF" y "Descargar PDF" en el detalle. Es la misma carta que puede bajar el ciudadano desde `/estado`.
 
 Reglas de la aprobación: `texto_original` nunca cambia (las ediciones van a `texto_actual`); no se puede aprobar un texto con avisos del sistema, notas internas, campos `[COMPLETAR: …]` o la firma sin llenar; al aprobar, la PQRSD pasa a `respondida`, queda quién aprobó y cuándo, y la respuesta final se guarda sin las etiquetas `[F#]`. El envío al ciudadano es simulado: cambia lo que ve en `/estado`.
 
@@ -151,6 +158,9 @@ Endpoints (todos piden `Authorization: Bearer <token>` salvo el acceso):
 | `POST /api/bandeja/{radicado}/borrador/generar` | Redactar el borrador si falta |
 | `PUT /api/bandeja/{radicado}/borrador` | Guardar la edición |
 | `POST /api/bandeja/{radicado}/aprobar` | Aprobar y marcar como respondida |
+| `GET /api/bandeja/{radicado}/respuesta.pdf` | Carta de respuesta aprobada en PDF (`?descargar=true` para bajarla) |
+| `POST /api/bandeja/{radicado}/chat` | Un turno del asistente de redacción: respuesta breve y, si aplica, la carta propuesta |
+| `POST /api/bandeja/{radicado}/retroalimentacion` | Guardar un aprendizaje y llevarlo a la base de conocimiento |
 | `GET /api/bandeja/exportar/csv` | Descargar la base en CSV |
 | `GET /api/metricas` | Resumen, distribuciones, calendario y gasto de IA |
 
@@ -171,8 +181,9 @@ backend/            API FastAPI (Python 3.12)
   app/db.py         engine, sesión e inicialización del esquema
   app/models/       tablas: pqrsd, borradores, revisiones, fragmentos_conocimiento,
                     cache_embeddings_consulta, consumos_ia, consultas_desvio
-  app/api/          endpoints: costos y chat de desvío (los demás, pendientes)
-  app/pipeline/     RAG, costos y desvío; clasificador y generador pendientes; prompts/ en .md
+  app/api/          endpoints: radicación, estado, chats, panel (admin, bandeja, métricas), costos
+  app/pipeline/     orquestador, clasificador, generador, RAG, chats, plazos, costos; prompts/ en .md
+  app/pdf_respuesta.py  carta de respuesta en PDF con el membrete del banco
 frontend/           React + Vite, servido por nginx en su contenedor
 nginx/nginx.conf    proxy: /api/ -> backend:8000, / -> frontend
 data/               conocimiento y ejemplos ficticios, scripts de carga
