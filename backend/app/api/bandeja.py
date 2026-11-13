@@ -266,6 +266,8 @@ def _celda(valor) -> str:
         return ""
     if isinstance(valor, bool):
         return "sí" if valor else "no"
+    if isinstance(valor, int | float):
+        return str(valor)  # un número negativo no es una fórmula
     texto = valor.isoformat() if hasattr(valor, "isoformat") else str(valor)
     return f"'{texto}" if texto.startswith(("=", "+", "-", "@")) else texto
 

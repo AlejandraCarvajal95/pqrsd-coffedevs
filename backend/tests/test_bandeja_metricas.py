@@ -474,6 +474,7 @@ def test_generar_el_borrador_a_pedido(panel, monkeypatch):
 def test_exportar_csv(panel):
     http, cabeceras, sesion = panel
     abierta = _pqrsd(sesion, 5, riesgo_fraude=True)
+    vencida = _pqrsd(sesion, -10)
     respondida = _pqrsd(sesion, 2)
     _borrador(sesion, respondida)
     final = "=Respuesta final, con coma y \"comillas\". Atentamente, Ana Ficticia."
@@ -490,7 +491,9 @@ def test_exportar_csv(panel):
     filas = list(csv.DictReader(io.StringIO(respuesta.content.decode("utf-8-sig"))))
     assert list(filas[0]) == list(bandeja.COLUMNAS_CSV)
     por_radicado = {fila["radicado"]: fila for fila in filas}
-    assert set(por_radicado) == {abierta.radicado, respondida.radicado}
+    assert set(por_radicado) == {abierta.radicado, vencida.radicado, respondida.radicado}
+    # Los días de atraso son un número negativo, no una fórmula: van sin apóstrofo.
+    assert int(por_radicado[vencida.radicado]["dias_habiles_restantes"]) < 0
     fila = por_radicado[abierta.radicado]
     assert (fila["estado"], fila["tipo"], fila["area"]) == (
         "clasificada", "reclamo", "Tarjetas de Crédito",
