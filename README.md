@@ -1,7 +1,7 @@
 # PQRSD Coffee Devs
 
 Plataforma web de gestión inteligente de PQRSD (peticiones, quejas, reclamos, sugerencias y denuncias) del equipo Coffee Devs para el hackathon NEPXA.
-Cada PQRSD se radica, Claude la clasifica (tipo, área y confianza), un RAG sobre pgvector recupera la normativa aplicable y Claude redacta un borrador con citas.
+Cada PQRSD se radica, Claude y un SVM local la clasifican (tipo, área, confianza y riesgo de fraude), un RAG sobre pgvector recupera la normativa aplicable y Claude redacta un borrador con citas.
 Una persona revisa, edita y aprueba la respuesta en una bandeja con semáforo de vencimiento: nada se envía al ciudadano sin aprobación humana.
 
 ## Cómo correrlo
@@ -50,8 +50,16 @@ Abre http://localhost/radicar, o usa "Continuar con una PQRSD" desde el chat. El
 
 El primer paso del pipeline es el clasificador (US-011, `pipeline/clasificador.py`). El modelo liviano, con el prompt y los ejemplos de `prompts/clasificador.md`, asigna `tipo`, `area` (Tarjetas de Crédito, Cartera, Seguros de Vida o Jurídica) y `confianza` (0 a 1), y deja la PQRSD en `clasificada`. Si la salida no es válida reintenta una vez. Si vuelve a fallar, o la API o el presupuesto fallan, la deja en `pendiente_revision_clasificacion` para que la clasifique una persona. Para ver el resultado:
 
+Después corre la clasificación híbrida (`pipeline/clasificacion_hibrida.py`): un SVM local (`pipeline/svm.py`, sin costo de API) resuelve tema, sentimiento y riesgo de fraude, y verifica el tipo y el área de Claude.
+
+- **Tipo:** siempre el de Claude. Si el SVM propone otro con confianza de 0,7 o más, la PQRSD va a revisión humana y el plazo usa el más corto de los dos.
+- **Área:** si no coinciden, gana el SVM cuando su confianza es de 0,8 o más. Si el texto nombra un seguro, una póliza o un siniestro, el área es Seguros de Vida.
+- **A revisión humana:** confianza de Claude menor que 0,6, o un caso que el SVM marca como fuera de competencia.
+
+Los modelos entrenados están versionados en `backend/app/pipeline/modelos_svm/` (con sus métricas en `metricas.md`) y se cargan al arrancar (`PRECARGAR_MODELOS`). Para reentrenarlos, ver el encabezado de `data/scripts/svm/entrenar.py`; el dataset se arma con `data/scripts/dataset/` (tiene su propio README).
+
 ```bash
-docker compose exec db psql -U pqrsd -d pqrsd -c "select radicado, estado, tipo, area, confianza from pqrsd"
+docker compose exec db psql -U pqrsd -d pqrsd -c "select radicado, estado, tipo, area, confianza, riesgo_fraude from pqrsd"
 ```
 
 ```bash
@@ -74,7 +82,7 @@ docker compose exec db psql -U pqrsd -d pqrsd -c "select p.radicado, p.estado, b
 
 ### Consultar el estado de una PQRSD (US-010)
 
-Abre http://localhost/estado e ingresa el radicado. El endpoint es `GET /api/pqrsd/{radicado}` y devuelve solo `radicado`, `estado` (`recibida`, `en_tramite` o `respondida`), `etiqueta`, `fecha_radicacion` y `fecha_vencimiento` (nula hasta que exista el cálculo de plazos). Un radicado inexistente da siempre el mismo 404 genérico, y cada IP puede hacer 20 consultas por minuto (después, 429).
+Abre http://localhost/estado e ingresa el radicado. El endpoint es `GET /api/pqrsd/{radicado}` y devuelve solo `radicado`, `estado` (`recibida`, `en_tramite` o `respondida`), `etiqueta`, `fecha_radicacion` y `fecha_vencimiento`. No expone clasificación, borradores ni datos de la persona. Un radicado inexistente da siempre el mismo 404 genérico, y cada IP puede hacer 20 consultas por minuto (después, 429).
 
 ```bash
 curl -s localhost/api/pqrsd/PQRSD-2026-ABC234
@@ -147,11 +155,13 @@ Qué trae el panel:
 
 Reglas de la aprobación: `texto_original` nunca cambia (las ediciones van a `texto_actual`); no se puede aprobar un texto con avisos del sistema, notas internas, campos `[COMPLETAR: …]` o la firma sin llenar; al aprobar, la PQRSD pasa a `respondida`, queda quién aprobó y cuándo, y la respuesta final se guarda sin las etiquetas `[F#]`. El envío al ciudadano es simulado: cambia lo que ve en `/estado`.
 
-Endpoints (todos piden `Authorization: Bearer <token>` salvo el acceso):
+Endpoints (todos piden `Authorization: Bearer <token>` salvo `modo` y `login`):
 
 | Endpoint | Para qué |
 | --- | --- |
-| `POST /api/admin/login` | Devuelve el token de la sesión (12 horas por defecto) |
+| `GET /api/admin/modo` | Dice si el panel está disponible en este entorno (sin token) |
+| `POST /api/admin/login` | Devuelve el token de la sesión (12 horas por defecto, `ADMIN_SESION_HORAS`); 10 intentos por minuto por IP |
+| `GET /api/admin/sesion` | Comprueba que el token sigue vigente |
 | `GET /api/bandeja` | Lista por urgencia con filtros |
 | `GET /api/bandeja/{radicado}` | Detalle, borrador y fuentes |
 | `PATCH /api/bandeja/{radicado}/clasificacion` | Confirmar o corregir tipo y área |
@@ -168,16 +178,17 @@ Pendiente de US-022: roles por área (hoy hay un solo usuario del equipo).
 
 ### Asistente de redacción del empleado (US-021)
 
-En el detalle de una PQRSD con borrador (`/admin/pqrsd/:radicado`) está el bloque **Asistente de redacción**. La persona escribe una instrucción ("hazlo más empático", "explica el plazo") o usa una sugerencia rápida; el modelo de borrador responde y, si aplica, propone la carta completa.
+En el detalle de una PQRSD con borrador (`/admin/pqrsd/:radicado`) el asistente ocupa el panel izquierdo, como un chat. La persona escribe una instrucción ("hazlo más empático", "explica el plazo") o usa una sugerencia rápida; el modelo de borrador responde y, si aplica, propone la carta completa.
 
-- **Nada cambia sin la persona:** la propuesta solo entra al editor con **Aplicar al editor**, y se puede **Deshacer**. `texto_original` no se toca; para guardar hay que pulsar **Guardar cambios**.
+- **El cambio se aplica solo:** la carta propuesta reemplaza el texto del documento y se guarda de inmediato (`PUT .../borrador`, queda en `revisiones`). El último cambio se puede **Deshacer** desde el chat y **Restaurar original** vuelve al texto de la IA. `texto_original` no se toca.
+- **Nada llega al ciudadano sin la persona:** el asistente solo edita el borrador. La respuesta sale únicamente con **Aprobar y enviar**.
 - **Citas:** las etiquetas `[F#]` del borrador conservan su significado. Si la instrucción necesita otra fuente, el RAG la busca y la numera a continuación; las etiquetas sin fuente se borran. Las fuentes nuevas de una propuesta se agregan a las "Fuentes citadas" del borrador.
 - **Costo:** usa `MODELO_BORRADOR` (tarea `edicion` del contador de gasto). Solo viajan el caso, el texto del editor, la instrucción y los dos últimos turnos. Cada conversación admite `MAX_MENSAJES_SESION` instrucciones (12 por defecto); la conversación vive en el navegador y se reinicia al recargar la página.
 - **Prompt:** `backend/app/pipeline/prompts/chat_empleado.md`. Si se pide algo que las fuentes no respaldan, el asistente lo dice en vez de escribirlo.
 
 ### Aprendizajes del equipo en la base de conocimiento (US-023)
 
-En el mismo detalle, antes o después de aprobar, **Guardar aprendizaje en la base de conocimiento** registra una regla o corrección para casos futuros.
+En el mismo detalle, dentro de **Detalles del caso**, antes o después de aprobar, **Guardar aprendizaje en la base de conocimiento** registra una regla o corrección para casos futuros.
 
 - Se guarda como un `.md` en `data/conocimiento/retroalimentacion/` con este nombre: `retro_AAAAMMDD_<radicado>_<resumen-del-titulo>.md`. El nombre lo arma el sistema; lo que escribe la persona nunca llega a la ruta.
 - Se indexa de inmediato en pgvector, sin tocar los demás fragmentos. La recarga completa (`cargar_conocimiento.py`) también lee esa carpeta.
@@ -205,7 +216,7 @@ Lista de arranque, en orden:
    docker compose run --rm backend python /data/scripts/cargar_conocimiento.py
    ```
 
-5. Si la base del servidor se creó antes de los últimos cambios del modelo, recréela (`docker compose down -v`, borra los datos) o agregue las columnas a mano: `create_all` no altera tablas existentes. Las historias US-021 y US-023 no cambiaron el esquema.
+5. Si la base del servidor se creó antes de los últimos cambios del modelo, recréela (`docker compose down -v`, borra los datos) o agregue las columnas a mano: `create_all` no altera tablas existentes. Las historias US-021 y US-023 y la respuesta en PDF no cambiaron el esquema.
 6. Si tras reconstruir el backend aparece un 502: `docker compose restart nginx`.
 7. Siga el guion de [docs/demo.md](docs/demo.md): trae los tres casos, los textos para copiar y el plan B.
 
@@ -220,7 +231,8 @@ backend/                  API FastAPI (Python 3.12)
                           cache_embeddings_consulta, consumos_ia, consultas_desvio
   app/api/                pqrsd y estado (ciudadano), chat y chat_radicacion, costos,
                           admin (acceso), bandeja (panel, asistente, aprendizajes), metricas
-  app/pipeline/           orquestador, clasificador, svm, clasificacion_hibrida, dias_habiles,
+  app/pipeline/           orquestador, clasificador, svm (modelos en modelos_svm/),
+                          clasificacion_hibrida, dias_habiles,
                           rag, embeddings, conocimiento, generador, chat_empleado,
                           retroalimentacion, desvio, radicacion_chat, costos; prompts/ en .md
   app/pdf_respuesta.py    carta de respuesta en PDF con el membrete del banco
@@ -231,8 +243,9 @@ frontend/                 React + Vite, servido por nginx en su contenedor
   src/styles/             tokens de identidad y hojas por zona
 nginx/nginx.conf          proxy: /api/ -> backend:8000, / -> frontend
 data/conocimiento/        base de conocimiento ficticia; retroalimentacion/ = aprendizajes
+data/ejemplos/            consultas de prueba del chat de desvío
 data/scripts/             carga del conocimiento, dataset y entrenamiento del SVM
-docs/                     arquitectura, backlog, identidad visual, contexto y guion de demo
+docs/                     problema, arquitectura, backlog, identidad visual, contexto y guion de demo
 ```
 
 Convenciones del equipo: ver [CLAUDE.md](CLAUDE.md).
@@ -292,7 +305,7 @@ Responsabilidades por frente. La columna **Persona** la completa el equipo.
 | Portal del ciudadano | Formulario, chat de radicación, chat de desvío y consulta de estado | `backend/app/api/{pqrsd,estado,chat,chat_radicacion}.py`, `backend/app/pipeline/{desvio,radicacion_chat}.py`, `frontend/src/pages/` | US-007 a US-010 | |
 | Pipeline de IA | Clasificación híbrida, RAG, borrador con citas y control de costos | `backend/app/pipeline/{orquestador,clasificador,clasificacion_hibrida,rag,generador,costos}.py`, `prompts/` | US-011 a US-015 | |
 | Plazos | Días hábiles de Colombia, vencimiento y semáforo | `backend/app/pipeline/dias_habiles.py` | US-016, US-017 | |
-| Panel del equipo | Acceso, bandeja, calendario, editor, aprobación, CSV y métricas | `backend/app/api/{admin,bandeja,metricas}.py`, `frontend/src/pages/Admin*.jsx` | US-019, US-020, US-022, US-024 | |
+| Panel del equipo | Acceso, bandeja, calendario, editor, aprobación, respuesta en PDF, CSV y métricas | `backend/app/api/{admin,bandeja,metricas}.py`, `backend/app/pdf_respuesta.py`, `frontend/src/pages/Admin*.jsx` | US-019, US-020, US-022, US-024 | |
 | Asistente y aprendizaje | Chat para ajustar el borrador y aprendizajes en `.md` | `backend/app/pipeline/{chat_empleado,retroalimentacion}.py`, `frontend/src/components/{AsistenteBorrador,Aprendizaje}.jsx` | US-021, US-023 | |
 | Experiencia y demo | Identidad visual, textos en lenguaje claro, guion y ensayo | `docs/identidad-visual.md`, `frontend/src/styles/`, `docs/demo.md` | US-026, US-027 | |
 
