@@ -1167,3 +1167,54 @@
   margin: var(--espacio-16) 0 0;
   color: var(--color-pizarra);
 }
+
+/* Radicar: elección entre radicar con el asistente (US-008) o por cuenta propia (US-007). */
+.caminos {
+  display: grid;
+  gap: var(--espacio-16);
+  margin-top: var(--espacio-32);
+}
+
+.camino {
+  display: grid;
+  gap: var(--espacio-12);
+  align-content: start;
+  justify-items: start;
+  padding: clamp(20px, 4vw, 32px);
+}
+
+.camino__sello {
+  color: var(--color-carbon);
+}
+
+.camino p:not(.camino__sello) {
+  max-width: 46ch;
+  color: var(--color-carbon);
+}
+
+.camino .boton {
+  margin-top: var(--espacio-8);
+}
+
+.caminos + .radicar__alterna + .radicar {
+  margin-top: var(--espacio-40);
+}
+
+#formulario {
+  scroll-margin-top: 96px;
+}
+
+.radicar__titulo {
+  margin-bottom: var(--espacio-16);
+}
+
+/* Tras radicar, la tarjeta se vuelve transparente y el título sobra. */
+.radicar__formulario:has(.confirmacion) .radicar__titulo {
+  display: none;
+}
+
+@media (min-width: 760px) {
+  .caminos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

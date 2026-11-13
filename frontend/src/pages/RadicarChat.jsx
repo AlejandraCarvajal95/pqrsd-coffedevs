@@ -105,12 +105,13 @@ export default function RadicarChat() {
 
   return (
     <div className="contenedor contenedor--angosto pagina chat">
-      <h1 className="display-seccion pagina__titulo">Radicar contándole su caso al asistente</h1>
+      <h1 className="display-seccion pagina__titulo">Radicar con el asistente</h1>
       <p className="pagina__bajada texto-apoyo">
-        Cuente qué ocurrió y el asistente arma su PQRSD. Antes de radicar podrá revisar el resumen,
-        y una persona del banco revisará y aprobará la respuesta. No escriba su cédula, números de
-        tarjeta ni claves. ¿Prefiere llenar los campos usted mismo?{' '}
-        <Link className="enlace" to="/radicar">Use el formulario</Link>.
+        Cuente qué ocurrió con sus palabras y el asistente le irá preguntando lo que falte para
+        armar su PQRSD. Antes de radicar podrá revisar el resumen, y una persona del banco
+        revisará y aprobará la respuesta. No escriba su cédula, números de tarjeta ni claves.
+        ¿Prefiere llenar los campos usted mismo?{' '}
+        <Link className="enlace" to="/radicar">Radique por su cuenta con el formulario</Link>.
       </p>
 
       <div className="tarjeta tarjeta--nube chat__panel">
