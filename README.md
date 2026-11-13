@@ -159,35 +159,80 @@ Endpoints (todos piden `Authorization: Bearer <token>` salvo el acceso):
 | `PUT /api/bandeja/{radicado}/borrador` | Guardar la edición |
 | `POST /api/bandeja/{radicado}/aprobar` | Aprobar y marcar como respondida |
 | `GET /api/bandeja/{radicado}/respuesta.pdf` | Carta de respuesta aprobada en PDF (`?descargar=true` para bajarla) |
-| `POST /api/bandeja/{radicado}/chat` | Un turno del asistente de redacción: respuesta breve y, si aplica, la carta propuesta |
-| `POST /api/bandeja/{radicado}/retroalimentacion` | Guardar un aprendizaje y llevarlo a la base de conocimiento |
+| `POST /api/bandeja/{radicado}/chat` | Pedir un ajuste del borrador al asistente (US-021) |
+| `POST /api/bandeja/{radicado}/retroalimentacion` | Guardar un aprendizaje como `.md` e indexarlo (US-023) |
 | `GET /api/bandeja/exportar/csv` | Descargar la base en CSV |
 | `GET /api/metricas` | Resumen, distribuciones, calendario y gasto de IA |
 
 Pendiente de US-022: roles por área (hoy hay un solo usuario del equipo).
 
+### Asistente de redacción del empleado (US-021)
+
+En el detalle de una PQRSD con borrador (`/admin/pqrsd/:radicado`) está el bloque **Asistente de redacción**. La persona escribe una instrucción ("hazlo más empático", "explica el plazo") o usa una sugerencia rápida; el modelo de borrador responde y, si aplica, propone la carta completa.
+
+- **Nada cambia sin la persona:** la propuesta solo entra al editor con **Aplicar al editor**, y se puede **Deshacer**. `texto_original` no se toca; para guardar hay que pulsar **Guardar cambios**.
+- **Citas:** las etiquetas `[F#]` del borrador conservan su significado. Si la instrucción necesita otra fuente, el RAG la busca y la numera a continuación; las etiquetas sin fuente se borran. Las fuentes nuevas de una propuesta se agregan a las "Fuentes citadas" del borrador.
+- **Costo:** usa `MODELO_BORRADOR` (tarea `edicion` del contador de gasto). Solo viajan el caso, el texto del editor, la instrucción y los dos últimos turnos. Cada conversación admite `MAX_MENSAJES_SESION` instrucciones (12 por defecto); la conversación vive en el navegador y se reinicia al recargar la página.
+- **Prompt:** `backend/app/pipeline/prompts/chat_empleado.md`. Si se pide algo que las fuentes no respaldan, el asistente lo dice en vez de escribirlo.
+
+### Aprendizajes del equipo en la base de conocimiento (US-023)
+
+En el mismo detalle, antes o después de aprobar, **Guardar aprendizaje en la base de conocimiento** registra una regla o corrección para casos futuros.
+
+- Se guarda como un `.md` en `data/conocimiento/retroalimentacion/` con este nombre: `retro_AAAAMMDD_<radicado>_<resumen-del-titulo>.md`. El nombre lo arma el sistema; lo que escribe la persona nunca llega a la ruta.
+- Se indexa de inmediato en pgvector, sin tocar los demás fragmentos. La recarga completa (`cargar_conocimiento.py`) también lee esa carpeta.
+- Al redactar o ajustar un borrador, el RAG reserva un lugar adicional para el aprendizaje más parecido, si supera `RAG_UMBRAL_SIMILITUD`. El chat del ciudadano no usa esa reserva, pero sí puede recuperar un aprendizaje si queda entre los más parecidos: **no escriban datos de ciudadanos en un aprendizaje**.
+- Los `.md` generados no están en `.gitignore`: si un aprendizaje debe quedar para todo el equipo, súbanlo al repositorio; si era una prueba, bórrenlo y recarguen con `--eliminar-huerfanos`.
+
+**Permisos de la carpeta.** `docker-compose.yml` monta `data/` en solo lectura y `data/conocimiento/retroalimentacion/` con escritura. En Windows y macOS funciona sin más. En Linux (el servidor del evento) el backend corre con un usuario sin privilegios y hay que permitirle escribir:
+
+```bash
+chmod a+rwx data/conocimiento/retroalimentacion
+```
+
+Si falta ese permiso, el panel responde "la carpeta de retroalimentación no admite escritura" y no guarda nada. La carpeta se puede cambiar con `RETROALIMENTACION_DIR`.
+
 ### Antes de la demo en el servidor
 
-1. Cargue la base de conocimiento (`data/scripts/cargar_conocimiento.py`, ver arriba). Sin ella todos los borradores salen "sin contexto".
-2. Defina `APP_ENV=evento` y `ADMIN_CLAVE` en el `.env` del servidor.
-3. Si la base del servidor se creó antes de los últimos cambios del modelo, recréela (`docker compose down -v`, borra los datos) o agregue las columnas a mano: `create_all` no altera tablas existentes.
+Lista de arranque, en orden:
+
+1. `cp .env.example .env` y complete: `ANTHROPIC_API_KEY`, `POSTGRES_PASSWORD` (igual a la de `DB_URL`), `APP_ENV=evento` y una `ADMIN_CLAVE` propia. Sin clave propia y fuera de `desarrollo`, el panel queda cerrado.
+2. `chmod a+rwx data/conocimiento/retroalimentacion` (solo Linux).
+3. `docker compose up -d --build` y compruebe `curl -s localhost/api/health`: debe responder `{"estado":"ok","db":true}`.
+4. Cargue la base de conocimiento. Sin ella todos los borradores salen "sin contexto":
+
+   ```bash
+   docker compose run --rm backend python /data/scripts/cargar_conocimiento.py
+   ```
+
+5. Si la base del servidor se creó antes de los últimos cambios del modelo, recréela (`docker compose down -v`, borra los datos) o agregue las columnas a mano: `create_all` no altera tablas existentes. Las historias US-021 y US-023 no cambiaron el esquema.
+6. Si tras reconstruir el backend aparece un 502: `docker compose restart nginx`.
+7. Siga el guion de [docs/demo.md](docs/demo.md): trae los tres casos, los textos para copiar y el plan B.
 
 ## Estructura
 
 ```
-backend/            API FastAPI (Python 3.12)
-  app/main.py       app, lifespan y rutas bajo /api
-  app/config.py     variables de entorno (pydantic-settings)
-  app/db.py         engine, sesión e inicialización del esquema
-  app/models/       tablas: pqrsd, borradores, revisiones, fragmentos_conocimiento,
-                    cache_embeddings_consulta, consumos_ia, consultas_desvio
-  app/api/          endpoints: radicación, estado, chats, panel (admin, bandeja, métricas), costos
-  app/pipeline/     orquestador, clasificador, generador, RAG, chats, plazos, costos; prompts/ en .md
-  app/pdf_respuesta.py  carta de respuesta en PDF con el membrete del banco
-frontend/           React + Vite, servido por nginx en su contenedor
-nginx/nginx.conf    proxy: /api/ -> backend:8000, / -> frontend
-data/               conocimiento y ejemplos ficticios, scripts de carga
-docs/               arquitectura, backlog y guion de demo
+backend/                  API FastAPI (Python 3.12)
+  app/main.py             app, lifespan y rutas bajo /api
+  app/config.py           variables de entorno (pydantic-settings)
+  app/db.py               engine, sesión e inicialización del esquema
+  app/models/             tablas: pqrsd, borradores, revisiones, fragmentos_conocimiento,
+                          cache_embeddings_consulta, consumos_ia, consultas_desvio
+  app/api/                pqrsd y estado (ciudadano), chat y chat_radicacion, costos,
+                          admin (acceso), bandeja (panel, asistente, aprendizajes), metricas
+  app/pipeline/           orquestador, clasificador, svm, clasificacion_hibrida, dias_habiles,
+                          rag, embeddings, conocimiento, generador, chat_empleado,
+                          retroalimentacion, desvio, radicacion_chat, costos; prompts/ en .md
+  app/pdf_respuesta.py    carta de respuesta en PDF con el membrete del banco
+  tests/                  pruebas (pytest); ninguna llama a la API real
+frontend/                 React + Vite, servido por nginx en su contenedor
+  src/pages/              portal del ciudadano y panel del equipo (Admin*.jsx)
+  src/components/         piezas compartidas, asistente de redacción y aprendizajes
+  src/styles/             tokens de identidad y hojas por zona
+nginx/nginx.conf          proxy: /api/ -> backend:8000, / -> frontend
+data/conocimiento/        base de conocimiento ficticia; retroalimentacion/ = aprendizajes
+data/scripts/             carga del conocimiento, dataset y entrenamiento del SVM
+docs/                     arquitectura, backlog, identidad visual, contexto y guion de demo
 ```
 
 Convenciones del equipo: ver [CLAUDE.md](CLAUDE.md).
@@ -238,9 +283,17 @@ Ambos comandos deben salir vacíos. (Los corchetes evitan que el propio README c
 
 ## Quién hace qué
 
-| Persona | Responsabilidad | Historias |
-| --- | --- | --- |
-| | | |
-| | | |
-| | | |
-| | | |
+Responsabilidades por frente. La columna **Persona** la completa el equipo.
+
+| Frente | Qué hace | Dónde vive | Historias | Persona |
+| --- | --- | --- | --- | --- |
+| Plataforma | Docker, base de datos, configuración y secretos, CI | `docker-compose.yml`, `nginx/`, `backend/app/{config,db}.py`, `backend/app/models/`, `.github/workflows/` | US-001 a US-003 | |
+| Conocimiento y datos | Empresa ficticia, normativa, carga con embeddings, dataset y SVM | `data/conocimiento/`, `data/scripts/`, `backend/app/pipeline/{conocimiento,embeddings,svm}.py` | US-004 a US-006, US-025 | |
+| Portal del ciudadano | Formulario, chat de radicación, chat de desvío y consulta de estado | `backend/app/api/{pqrsd,estado,chat,chat_radicacion}.py`, `backend/app/pipeline/{desvio,radicacion_chat}.py`, `frontend/src/pages/` | US-007 a US-010 | |
+| Pipeline de IA | Clasificación híbrida, RAG, borrador con citas y control de costos | `backend/app/pipeline/{orquestador,clasificador,clasificacion_hibrida,rag,generador,costos}.py`, `prompts/` | US-011 a US-015 | |
+| Plazos | Días hábiles de Colombia, vencimiento y semáforo | `backend/app/pipeline/dias_habiles.py` | US-016, US-017 | |
+| Panel del equipo | Acceso, bandeja, calendario, editor, aprobación, CSV y métricas | `backend/app/api/{admin,bandeja,metricas}.py`, `frontend/src/pages/Admin*.jsx` | US-019, US-020, US-022, US-024 | |
+| Asistente y aprendizaje | Chat para ajustar el borrador y aprendizajes en `.md` | `backend/app/pipeline/{chat_empleado,retroalimentacion}.py`, `frontend/src/components/{AsistenteBorrador,Aprendizaje}.jsx` | US-021, US-023 | |
+| Experiencia y demo | Identidad visual, textos en lenguaje claro, guion y ensayo | `docs/identidad-visual.md`, `frontend/src/styles/`, `docs/demo.md` | US-026, US-027 | |
+
+Pendiente del backlog: alertas escalonadas (US-018), roles por área (resto de US-022) y los extras de US-028.

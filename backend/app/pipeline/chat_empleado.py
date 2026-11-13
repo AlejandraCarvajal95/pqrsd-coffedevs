@@ -143,7 +143,9 @@ def reunir_fuentes(
     siguiente = max((_numero(fuente.etiqueta) for fuente in fuentes), default=0) + 1
 
     # La instrucción va primero: el modelo de embeddings solo "ve" el inicio del texto.
-    resultado = rag.recuperar(sesion, f"{instruccion}\n{pqrsd.asunto}\n{pqrsd.descripcion}")
+    resultado = rag.recuperar(
+        sesion, f"{instruccion}\n{pqrsd.asunto}\n{pqrsd.descripcion}", con_aprendizajes=True
+    )
     for fragmento in resultado.fragmentos:
         if str(fragmento.id) in presentes:
             continue
