@@ -56,12 +56,28 @@ class TransformadorEmbeddings(BaseEstimator, TransformerMixin):
         )
 
 
-def construir_modelo(c: float = 1.0, particiones_calibracion: int = 3) -> Pipeline:
+@dataclass(frozen=True)
+class Vocabulario:
+    """Tamaño del vocabulario TF-IDF. Menos características = menos capacidad de memorizar."""
+
+    max_palabras: int = 20_000
+    min_df_palabras: int = 2
+    max_caracteres: int = 30_000
+    min_df_caracteres: int = 3
+
+
+VOCABULARIO_POR_DEFECTO = Vocabulario()
+
+
+def construir_modelo(c: float = 1.0, particiones_calibracion: int = 3,
+                     vocabulario: Vocabulario = VOCABULARIO_POR_DEFECTO) -> Pipeline:
+    v = vocabulario
     caracteristicas = FeatureUnion([
-        ("palabras", TfidfVectorizer(ngram_range=(1, 2), min_df=2, max_features=20_000,
-                                     sublinear_tf=True)),
-        ("caracteres", TfidfVectorizer(analyzer="char_wb", ngram_range=(3, 5), min_df=3,
-                                       max_features=30_000, sublinear_tf=True)),
+        ("palabras", TfidfVectorizer(ngram_range=(1, 2), min_df=v.min_df_palabras,
+                                     max_features=v.max_palabras, sublinear_tf=True)),
+        ("caracteres", TfidfVectorizer(analyzer="char_wb", ngram_range=(3, 5),
+                                       min_df=v.min_df_caracteres,
+                                       max_features=v.max_caracteres, sublinear_tf=True)),
         ("embeddings", TransformadorEmbeddings()),
     ])
     svm = LinearSVC(C=c, class_weight="balanced", max_iter=5_000)
@@ -121,6 +137,18 @@ def _predecir(modelo: Pipeline, texto: str) -> PrediccionCapa:
         confianza=round(float(probs[i]), 4),
         probabilidades={c: round(float(p), 4) for c, p in zip(clases, probs, strict=True)},
     )
+
+
+def predecir(capa: str, texto: str) -> PrediccionCapa | None:
+    """Predicción de una sola capa; None si su modelo no existe."""
+    modelo = _modelo(capa)
+    return _predecir(modelo, texto) if modelo is not None else None
+
+
+def predecir_tema(texto: str, area: str) -> PrediccionCapa | None:
+    """Tema dentro de un área dada (por ejemplo, la que decidió la clasificación híbrida)."""
+    modelo = _modelo(f"tema_{area}") if area in AREAS_BANCO else None
+    return _predecir(modelo, texto) if modelo is not None else None
 
 
 def clasificar(texto: str) -> ResultadoSVM:

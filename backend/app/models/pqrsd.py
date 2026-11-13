@@ -5,7 +5,19 @@ import secrets
 import uuid
 from datetime import date, datetime, timedelta, timezone
 
-from sqlalchemy import CheckConstraint, Date, DateTime, Float, Index, String, Text, func, text
+from sqlalchemy import (
+    Boolean,
+    CheckConstraint,
+    Date,
+    DateTime,
+    Float,
+    Index,
+    String,
+    Text,
+    func,
+    text,
+)
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, enum_texto
@@ -77,6 +89,13 @@ class PQRSD(Base):
     tipo: Mapped[TipoPQRSD | None] = mapped_column(enum_texto(TipoPQRSD, "ck_pqrsd_tipo"))
     area: Mapped[str | None] = mapped_column(String(120))
     confianza: Mapped[float | None] = mapped_column(Float)
+    # Capas que resuelve el SVM (pipeline/clasificacion_hibrida.py).
+    tema: Mapped[str | None] = mapped_column(String(80))
+    sentimiento: Mapped[str | None] = mapped_column(String(20))
+    riesgo_fraude: Mapped[bool | None] = mapped_column(Boolean)
+    # Qué dijo cada clasificador, por qué quedó en revisión y los tipos candidatos
+    # (si el tipo es dudoso, el motor de plazos debe usar el plazo más corto).
+    clasificacion_detalle: Mapped[dict | None] = mapped_column(JSONB)
 
     estado: Mapped[EstadoPQRSD] = mapped_column(
         enum_texto(EstadoPQRSD, "ck_pqrsd_estado"),

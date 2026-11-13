@@ -9,7 +9,7 @@ from sqlalchemy import select
 
 from app.config import configuracion
 from app.models import PQRSD, CanalPQRSD, ConsumoIA, EstadoPQRSD
-from app.pipeline import clasificador, costos, orquestador
+from app.pipeline import clasificador, costos, orquestador, svm
 from app.pipeline.costos import ErrorIA, LimiteExcedido
 
 VALIDA = json.dumps(
@@ -198,6 +198,11 @@ def test_el_orquestador_clasifica_la_pqrsd_radicada(entorno, monkeypatch):
     monkeypatch.setattr(
         orquestador, "fabrica_sesion", lambda: contextlib.nullcontext(entorno.sesion)
     )
+    # El paso híbrido usa un SVM falso que coincide con Claude (ver test_clasificacion_hibrida).
+    falso = {"tipo": "reclamo", "area": "tarjetas", "sentimiento": "negativo", "fraude": "no"}
+    monkeypatch.setattr(svm, "predecir",
+                        lambda capa, texto: svm.PrediccionCapa(falso[capa], 0.9, {}))
+    monkeypatch.setattr(svm, "predecir_tema", lambda texto, area: None)
     pqrsd = _pqrsd(entorno.sesion)
     orquestador.procesar_pqrsd(pqrsd.id)
     entorno.sesion.refresh(pqrsd)

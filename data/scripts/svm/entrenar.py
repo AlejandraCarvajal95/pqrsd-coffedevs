@@ -42,14 +42,25 @@ def leer(capa: str) -> list[dict]:
         return list(csv.DictReader(f))
 
 
+CACHE_DISCO = Path("/data/datasets/intermedio/cache_embeddings.npz")
+
+
 def precalcular_embeddings(textos: set[str]):
+    """Calcula los embeddings que falten y los guarda en disco para las siguientes corridas."""
+    if not svm.CACHE_EMBEDDINGS and CACHE_DISCO.exists():
+        datos = np.load(CACHE_DISCO, allow_pickle=False)
+        svm.CACHE_EMBEDDINGS.update(zip(datos["textos"].tolist(), datos["vectores"], strict=True))
     pendientes = [t for t in textos if t not in svm.CACHE_EMBEDDINGS]
     inicio = time.time()
     for i in range(0, len(pendientes), 256):
         lote = pendientes[i:i + 256]
         for t, v in zip(lote, embeddings.generar_embeddings(lote), strict=True):
             svm.CACHE_EMBEDDINGS[t] = np.asarray(v, dtype=np.float32)
-    print(f"Embeddings: {len(pendientes)} textos en {time.time() - inicio:.0f} s", flush=True)
+    if pendientes:
+        np.savez(CACHE_DISCO, textos=np.array(list(svm.CACHE_EMBEDDINGS)),
+                 vectores=np.stack(list(svm.CACHE_EMBEDDINGS.values())))
+    segundos = time.time() - inicio
+    print(f"Embeddings: {len(pendientes)} textos nuevos en {segundos:.0f} s", flush=True)
 
 
 def entrenar(capa: str) -> dict:
@@ -61,18 +72,27 @@ def entrenar(capa: str) -> dict:
     x = {s: [f["texto"] for f in v] for s, v in por_split.items()}
     y = {s: [f[etiqueta] for f in v] for s, v in por_split.items()}
 
-    # 1. C por validación.
+    # 1. Vocabulario y C: los que eligió experimento_regularizacion.py para esta capa, si
+    #    existen; si no, el vocabulario por defecto y C por validación.
+    ruta_reg = svm.DIR_MODELOS / "regularizacion.json"
+    reg = json.loads(ruta_reg.read_text(encoding="utf-8")).get(capa) if ruta_reg.exists() else None
+    vocab = svm.Vocabulario(**reg["mejor"]["parametros"]) if reg else svm.Vocabulario()
     f1_val = {}
-    for c in VALORES_C:
-        modelo = svm.construir_modelo(c).fit(x["train"], y["train"])
-        f1_val[c] = f1_score(y["val"], modelo.predict(x["val"]), average="macro")
-    mejor_c = max(f1_val, key=f1_val.get)
+    if reg:
+        mejor_c = reg["mejor"]["c"]
+        f1_val[mejor_c] = reg["mejor"]["f1_val"]
+    else:
+        for c in VALORES_C:
+            modelo = svm.construir_modelo(c, vocabulario=vocab).fit(x["train"], y["train"])
+            f1_val[c] = f1_score(y["val"], modelo.predict(x["val"]), average="macro")
+        mejor_c = max(f1_val, key=f1_val.get)
 
     # 2. Modelo final con train + val; evaluación en test. Se registra si el optimizador
     # convergió: si no, el modelo quedó a medio camino y hay que subir max_iter.
     with warnings.catch_warnings(record=True) as avisos:
         warnings.simplefilter("always", ConvergenceWarning)
-        modelo = svm.construir_modelo(mejor_c).fit(x["train"] + x["val"], y["train"] + y["val"])
+        modelo = svm.construir_modelo(mejor_c, vocabulario=vocab).fit(
+            x["train"] + x["val"], y["train"] + y["val"])
     convergio = not any(issubclass(a.category, ConvergenceWarning) for a in avisos)
     pred = modelo.predict(x["test"])
     probs = modelo.predict_proba(x["test"]).max(axis=1)
@@ -96,6 +116,7 @@ def entrenar(capa: str) -> dict:
 
     metricas = {
         "capa": capa, "etiqueta": etiqueta, "clases": clases, "c": mejor_c, "convergio": convergio,
+        "vocabulario": vars(vocab),
         "f1_macro_val_por_c": {str(k): round(v, 4) for k, v in f1_val.items()},
         "n_train": len(x["train"]) + len(x["val"]), "n_test": len(x["test"]),
         "f1_macro_test": round(reporte["macro avg"]["f1-score"], 4),
