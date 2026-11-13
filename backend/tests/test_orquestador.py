@@ -11,7 +11,7 @@ from sqlalchemy import select
 
 from app.config import configuracion
 from app.models import PQRSD, Borrador, CanalPQRSD, ConsumoIA, EstadoPQRSD
-from app.pipeline import generador, orquestador, svm
+from app.pipeline import dias_habiles, generador, orquestador, svm
 
 CLASIFICACION = json.dumps(
     {
@@ -168,3 +168,48 @@ def test_sin_contexto_el_borrador_llega_con_aviso(pipeline):
     assert pqrsd.estado == EstadoPQRSD.borrador_listo
     assert borrador.citas == []
     assert generador.AVISO_SIN_CONTEXTO in borrador.texto_original
+
+
+def test_al_clasificar_se_recalcula_el_vencimiento_segun_el_tipo(pipeline, monkeypatch):
+    monkeypatch.setattr(configuracion, "plazos_por_tipo", {"reclamo": 10})
+    pipeline.usar(CLASIFICACION, CARTA)
+    pqrsd = _radicar(pipeline.sesion)
+    assert pqrsd.fecha_vencimiento is None  # esta prueba no pasa por el endpoint de radicar
+
+    orquestador.procesar_pqrsd(pqrsd.id)
+    pipeline.sesion.refresh(pqrsd)
+
+    radicada = dias_habiles.fecha_colombia(pqrsd.fecha_radicacion)
+    assert pqrsd.fecha_vencimiento == dias_habiles.sumar_dias_habiles(radicada, 10)
+
+
+def test_con_tipo_dudoso_el_vencimiento_usa_el_plazo_mas_corto(pipeline, monkeypatch):
+    # Claude dice "reclamo" (15 días) y el SVM "queja" (5 días) con mucha confianza.
+    monkeypatch.setattr(configuracion, "plazos_por_tipo", {"queja": 5})
+    pipeline.capas["tipo"] = "queja"
+    pipeline.usar(CLASIFICACION)
+    pqrsd = _radicar(pipeline.sesion)
+
+    orquestador.procesar_pqrsd(pqrsd.id)
+    pipeline.sesion.refresh(pqrsd)
+
+    assert pqrsd.estado == EstadoPQRSD.pendiente_revision_clasificacion
+    radicada = dias_habiles.fecha_colombia(pqrsd.fecha_radicacion)
+    assert pqrsd.fecha_vencimiento == dias_habiles.sumar_dias_habiles(radicada, 5)
+
+
+def test_redactar_borrador_solo_actua_sobre_clasificadas_sin_borrador(pipeline):
+    cliente = pipeline.usar(CARTA)
+    pqrsd = _radicar(pipeline.sesion)
+    orquestador.redactar_borrador(pqrsd.id)  # recibida: no hace nada
+    assert cliente.llamadas == []
+
+    pqrsd.estado = EstadoPQRSD.clasificada
+    pqrsd.tipo, pqrsd.area = "reclamo", "Tarjetas de Crédito"
+    pipeline.sesion.commit()
+    orquestador.redactar_borrador(pqrsd.id)
+    orquestador.redactar_borrador(pqrsd.id)  # ya tiene borrador: no repite la llamada
+    pipeline.sesion.refresh(pqrsd)
+
+    assert pqrsd.estado == EstadoPQRSD.borrador_listo
+    assert len(_borradores(pipeline.sesion, pqrsd)) == 1 and len(cliente.llamadas) == 1
