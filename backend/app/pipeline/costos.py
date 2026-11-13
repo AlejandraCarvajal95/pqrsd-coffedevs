@@ -1,8 +1,9 @@
 """Control de costos de IA (US-015). Toda llamada a Claude pasa por llamar_claude().
 
 Qué garantiza:
-1. Enrutamiento de modelos: clasificador, chat y edicion usan MODELO_LIGERO;
-   solo generador (el borrador final) usa MODELO_BORRADOR.
+1. Enrutamiento de modelos: clasificador y chat usan MODELO_LIGERO; generador
+   (el borrador) y edicion (el chat del empleado que lo ajusta, US-021) usan
+   MODELO_BORRADOR.
 2. Límites: max_tokens tope por tarea, tamaño máximo de la entrada y número
    máximo de mensajes por sesión de chat. Si se superan, se lanza
    LimiteExcedido con un mensaje claro y NO se llama a la API.
@@ -74,7 +75,8 @@ POLITICAS: dict[Tarea, PoliticaTarea] = {
     # en max_tokens. Con 400, el 8 % de las PQRSD del golden set quedaban sin clasificar.
     Tarea.clasificador: PoliticaTarea(RolModelo.ligero, 1_200, 12_000, "low"),
     Tarea.chat: PoliticaTarea(RolModelo.ligero, 700, 12_000, "low"),
-    Tarea.edicion: PoliticaTarea(RolModelo.ligero, 1_500, 16_000, "low"),
+    # La edición reescribe la carta completa: mismo modelo y tope de salida que el generador.
+    Tarea.edicion: PoliticaTarea(RolModelo.borrador, 2_000, 30_000, "low"),
     Tarea.generador: PoliticaTarea(RolModelo.borrador, 2_000, 24_000, "medium"),
 }
 
