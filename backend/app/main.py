@@ -11,7 +11,7 @@ from contextlib import asynccontextmanager
 from fastapi import APIRouter, FastAPI
 from fastapi.concurrency import run_in_threadpool
 
-from app.api import chat, costos, estado, pqrsd
+from app.api import chat, chat_radicacion, costos, estado, pqrsd
 from app.config import configuracion
 from app.db import base_disponible, inicializar_base_de_datos
 from app.pipeline import svm
@@ -49,6 +49,7 @@ def salud() -> dict:
 
 api.include_router(costos.router)
 api.include_router(chat.router)
+api.include_router(chat_radicacion.router)
 api.include_router(pqrsd.router)
 api.include_router(estado.router)
 app.include_router(api)
