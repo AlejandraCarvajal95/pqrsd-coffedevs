@@ -11,6 +11,7 @@ import pytest
 
 os.environ.setdefault("ANTHROPIC_API_KEY", "clave-falsa-para-pruebas")
 os.environ.setdefault("DB_URL", "postgresql+psycopg://pqrsd:pqrsd@localhost:5432/pqrsd_test")
+os.environ.setdefault("PRECARGAR_MODELOS", "false")  # no descargar el modelo de embeddings
 
 
 @pytest.fixture(scope="session")

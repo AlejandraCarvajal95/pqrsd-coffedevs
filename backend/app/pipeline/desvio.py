@@ -15,7 +15,6 @@ El historial de cada conversación vive en memoria (AlmacenSesiones), igual
 que el conteo de mensajes de costos.py: se pierde al reiniciar el backend.
 """
 
-import json
 import re
 import threading
 import uuid
@@ -30,6 +29,7 @@ from app.models import CoberturaDesvio, ConsultaDesvio
 from app.models.consulta_desvio import LARGO_MAXIMO_PREGUNTA
 from app.pipeline import costos, rag
 from app.pipeline.costos import LimiteExcedido, Tarea
+from app.pipeline.json_ia import extraer_objeto_json
 
 RUTA_PROMPT = Path(__file__).parent / "prompts" / "desvio.md"
 
@@ -209,15 +209,8 @@ def _armar_mensajes(sesion: SesionChat, resultado: rag.ResultadoRAG) -> list[dic
 
 def interpretar_salida(texto: str) -> tuple[CoberturaDesvio, str] | None:
     """Lee {"cobertura": ..., "respuesta": ...}. Tolera cercos de código y texto alrededor."""
-    limpio = re.sub(r"```(?:json)?", "", texto).strip()
-    inicio, fin = limpio.find("{"), limpio.rfind("}")
-    if inicio == -1 or fin <= inicio:
-        return None
-    try:
-        datos = json.loads(limpio[inicio : fin + 1])
-    except json.JSONDecodeError:
-        return None
-    if not isinstance(datos, dict):
+    datos = extraer_objeto_json(texto)
+    if datos is None:
         return None
     respuesta = datos.get("respuesta")
     try:

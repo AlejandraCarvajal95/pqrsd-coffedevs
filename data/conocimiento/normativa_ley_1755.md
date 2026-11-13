@@ -86,6 +86,33 @@ La respuesta debe ser de fondo, clara, precisa y congruente con lo solicitado. P
 4. Señalar los recursos o las instancias a las que el cliente puede acudir, como el defensor del consumidor financiero o la Superintendencia Financiera de Colombia, cuando aplique.
 5. Si no hay fuente que respalde una afirmación, decirlo y derivar el caso a una persona.
 
+### 5.1 Estructura de la respuesta
+Toda respuesta del Banco a una PQRSD sigue este orden:
+
+1. **Identificación:** nombre del Banco, área que responde y funcionario responsable.
+2. **Radicado** de la PQRSD y fecha de recepción.
+3. **Análisis de la solicitud:** qué pidió o planteó el cliente, en sus propios términos.
+4. **Respuesta sustentada:** los hechos verificados y las fuentes que la respaldan (contrato, política del Banco o ley).
+5. **Decisión expresa:** se concede, se niega, se explica o se orienta. Si se niega, se dice por qué.
+6. **Recursos e instancias:** a dónde puede acudir el cliente si no queda conforme.
+7. **Firma** del funcionario competente.
+
+Fuente: guía "Cómo deben responder las entidades públicas las PQRSD en Colombia", Politécnico Colombiano Jaime Isaza Cadavid, adaptada al Banco. El derecho de petición también se ejerce ante particulares (Ley 1755 de 2015, art. 32).
+
+### 5.2 Principios de la respuesta
+- **Gratuidad:** responder una PQRSD no tiene costo para el cliente.
+- **Legalidad:** no se exigen requisitos ni documentos distintos a los que pide la ley o el contrato.
+- **Lenguaje claro:** frases cortas, sin tecnicismos innecesarios y con trato respetuoso.
+- **Accesibilidad:** se atiende sin discriminación y se ajusta la comunicación a quien la necesite.
+- **Medio solicitado:** se responde por el canal que el cliente pidió, cuando sea posible.
+
+### 5.3 Errores que el Banco evita
+1. Respuestas genéricas que no se refieren al caso concreto.
+2. Comunicaciones de trámite ("recibimos su solicitud") que no resuelven lo pedido. Un acuse de recibo no cuenta como respuesta.
+3. Omitir los recursos o las instancias a las que puede acudir el cliente.
+4. Exigir documentos innecesarios o que el Banco ya tiene.
+5. Responder fuera del plazo legal sin justificación ni aviso de prórroga.
+
 ## 6. Regulación complementaria para el sector financiero
 
 - **Ley 1328 de 2009:** régimen de protección al consumidor financiero, incluido el defensor del consumidor financiero.
