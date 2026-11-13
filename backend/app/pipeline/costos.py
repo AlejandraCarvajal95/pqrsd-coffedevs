@@ -70,7 +70,9 @@ class PoliticaTarea:
 
 
 POLITICAS: dict[Tarea, PoliticaTarea] = {
-    Tarea.clasificador: PoliticaTarea(RolModelo.ligero, 400, 12_000, "low"),
+    # 1.200 y no 400: el modelo liviano razona antes de responder y ese razonamiento cuenta
+    # en max_tokens. Con 400, el 8 % de las PQRSD del golden set quedaban sin clasificar.
+    Tarea.clasificador: PoliticaTarea(RolModelo.ligero, 1_200, 12_000, "low"),
     Tarea.chat: PoliticaTarea(RolModelo.ligero, 700, 12_000, "low"),
     Tarea.edicion: PoliticaTarea(RolModelo.ligero, 1_500, 16_000, "low"),
     Tarea.generador: PoliticaTarea(RolModelo.borrador, 2_000, 24_000, "medium"),
