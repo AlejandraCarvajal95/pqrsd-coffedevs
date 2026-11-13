@@ -94,6 +94,27 @@ def test_si_el_svm_duda_queda_el_area_de_claude(sesion, svm_falso):
     assert detalle["origen_area"] == "claude"
 
 
+def test_regla_de_seguros_corrige_el_area(sesion, svm_falso):
+    pqrsd = _pqrsd(sesion)
+    pqrsd.descripcion = "Me cobran un seguro de vida en la tarjeta que nunca autoricé."
+    detalle = hibrida.complementar(sesion, pqrsd, _claude(area="Tarjetas de Crédito"))
+    assert pqrsd.area == "Seguros de Vida"
+    assert detalle["origen_area"] == "regla_seguros"
+
+
+@pytest.mark.parametrize("texto", [
+    "No estoy seguro de que la compra sea mía.",
+    "Estoy seguro de que pagué a tiempo la cuota de manejo.",
+    "Mi prima usó mi tarjeta sin permiso.",
+    "Me cobran una deuda médica que mi seguro debía cubrir.",
+])
+def test_seguro_como_adjetivo_no_activa_la_regla(sesion, svm_falso, texto):
+    pqrsd = _pqrsd(sesion)
+    pqrsd.descripcion = texto
+    hibrida.complementar(sesion, pqrsd, _claude(area="Tarjetas de Crédito"))
+    assert pqrsd.area == "Tarjetas de Crédito"
+
+
 def test_fuera_de_competencia_va_a_revision_y_no_tiene_tema(sesion, svm_falso):
     svm_falso["area"] = ("fuera_de_competencia", 0.95)
     pqrsd = _pqrsd(sesion)
