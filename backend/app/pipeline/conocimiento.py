@@ -30,6 +30,8 @@ logger = logging.getLogger(__name__)
 # fragmento siempre quedan dentro de lo que el modelo "ve".
 MAX_CARACTERES = 700
 SECCION_ENCABEZADO = "Encabezado"  # texto antes del primer "##"
+# Subcarpeta con los aprendizajes que guarda el panel (pipeline/retroalimentacion.py).
+CARPETA_RETROALIMENTACION = "retroalimentacion"
 SEPARADOR_SECCION = " › "
 LARGO_MAXIMO_SECCION = 300  # tamaño de la columna seccion
 
@@ -234,12 +236,14 @@ def cargar_directorio(
     forzar: bool = False,
     eliminar_huerfanos: bool = False,
 ) -> ResumenCarga:
-    """Sincroniza todos los .md del directorio. No hace commit.
+    """Sincroniza todos los .md del directorio y de su subcarpeta de aprendizajes.
 
-    Con eliminar_huerfanos=True borra los fragmentos de documentos cuyo
-    archivo ya no está en el directorio.
+    No hace commit. Con eliminar_huerfanos=True borra los fragmentos de
+    documentos cuyo archivo ya no está en el directorio ni en la subcarpeta.
     """
-    archivos = sorted(directorio.glob("*.md"))
+    archivos = sorted(directorio.glob("*.md")) + sorted(
+        directorio.glob(f"{CARPETA_RETROALIMENTACION}/*.md")
+    )
     if not archivos:
         raise FileNotFoundError(f"No hay archivos .md en {directorio}")
 
