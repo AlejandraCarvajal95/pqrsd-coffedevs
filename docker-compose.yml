@@ -19,6 +19,9 @@ services:
     volumes:
       - modelos:/modelos        # modelo de embeddings descargado (EMBEDDING_CACHE_DIR)
       - ./data:/data:ro         # conocimiento y scripts de carga
+      # Aprendizajes del equipo (US-023): el panel escribe aquí sus .md. En Linux la
+      # carpeta debe permitir escribir al usuario del contenedor (ver README).
+      - ./data/conocimiento/retroalimentacion:/data/conocimiento/retroalimentacion
     expose:
       - "8000"   # nginx lo alcanza como backend:8000
     depends_on:

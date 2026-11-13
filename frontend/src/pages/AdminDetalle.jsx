@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import Aprendizaje from '../components/Aprendizaje.jsx'
+import AsistenteBorrador from '../components/AsistenteBorrador.jsx'
 import { IconoAlerta, IconoCheck } from '../components/Iconos.jsx'
 import Semaforo from '../components/Semaforo.jsx'
 import {
@@ -211,6 +213,13 @@ export default function AdminDetalle() {
     return () => clearInterval(reloj)
   }, [esperandoBorrador, radicado, aplicar, manejarError])
 
+  // El asistente puede sumar fuentes al borrador: se recargan sin pisar el editor.
+  function refrescarFuentes() {
+    obtenerDetalleAdmin(radicado)
+      .then((datos) => aplicar(datos, true))
+      .catch(manejarError)
+  }
+
   async function ejecutar(accion, mensaje, conservarTexto = false) {
     setOcupado(true)
     setError(null)
@@ -302,6 +311,17 @@ export default function AdminDetalle() {
                 Boolean(pqrsd.borrador),
               )
             }
+          />
+
+          <Aprendizaje
+            radicado={radicado}
+            areas={pqrsd.opciones.areas}
+            areaInicial={pqrsd.clasificacion.area}
+            onGuardado={(mensaje) => {
+              setError(null)
+              setAviso(mensaje)
+            }}
+            onSesionVencida={manejarError}
           />
 
           {pqrsd.revisiones.length > 0 && (
@@ -432,6 +452,17 @@ export default function AdminDetalle() {
               </>
             )}
           </section>
+
+          {borrador && !respondida && (
+            <AsistenteBorrador
+              radicado={radicado}
+              texto={texto}
+              deshabilitado={ocupado}
+              onAplicar={setTexto}
+              onFuentesNuevas={refrescarFuentes}
+              onSesionVencida={manejarError}
+            />
+          )}
 
           {borrador && (
             <section className="tarjeta tarjeta--tecnica caso__bloque" aria-labelledby="titulo-fuentes">

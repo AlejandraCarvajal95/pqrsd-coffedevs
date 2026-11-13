@@ -65,6 +65,10 @@ class Configuracion(BaseSettings):
     semaforo_rojo_dias: int = Field(default=3, ge=0)
     semaforo_amarillo_dias: int = Field(default=7, ge=0)
 
+    # --- Aprendizajes del equipo (US-023) ---
+    # Carpeta donde el panel guarda los .md de retroalimentación. Debe admitir escritura.
+    retroalimentacion_dir: str = "/data/conocimiento/retroalimentacion"
+
     # --- Panel administrativo (US-022) ---
     admin_usuario: str = "admin"
     # Sin clave (o con el marcador de .env.example): en APP_ENV=desarrollo se usan las

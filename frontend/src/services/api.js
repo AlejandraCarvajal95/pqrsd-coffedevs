@@ -200,3 +200,21 @@ export async function descargarCsv() {
   enlace.remove()
   URL.revokeObjectURL(enlace.href)
 }
+
+// --- Asistente de redacción y aprendizajes del equipo (US-021 y US-023) ---
+
+// cuerpo: { mensaje, historial: [{ rol, texto }], borrador_actual }
+export function conversarConAsistente(radicado, cuerpo) {
+  return solicitarAdmin(`/bandeja/${encodeURIComponent(radicado)}/chat`, {
+    method: 'POST',
+    body: JSON.stringify(cuerpo),
+  })
+}
+
+// cuerpo: { titulo, contenido, area }
+export function guardarAprendizaje(radicado, cuerpo) {
+  return solicitarAdmin(`/bandeja/${encodeURIComponent(radicado)}/retroalimentacion`, {
+    method: 'POST',
+    body: JSON.stringify(cuerpo),
+  })
+}

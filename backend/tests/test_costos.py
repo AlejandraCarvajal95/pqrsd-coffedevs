@@ -62,9 +62,10 @@ def entorno(sesion, monkeypatch):
     costos.contador_mensajes.reiniciar()
 
 
-def test_solo_el_generador_usa_el_modelo_capaz():
-    assert POLITICAS[Tarea.generador].rol is RolModelo.borrador
-    for tarea in (Tarea.clasificador, Tarea.chat, Tarea.edicion):
+def test_solo_el_borrador_y_su_edicion_usan_el_modelo_capaz():
+    for tarea in (Tarea.generador, Tarea.edicion):
+        assert POLITICAS[tarea].rol is RolModelo.borrador
+    for tarea in (Tarea.clasificador, Tarea.chat):
         assert POLITICAS[tarea].rol is RolModelo.ligero
 
 
