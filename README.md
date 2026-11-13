@@ -126,7 +126,7 @@ Al radicar se guarda `fecha_vencimiento`: el plazo se cuenta en días hábiles d
 
 Abra http://localhost/admin (también hay un enlace "Panel del equipo" en el pie). Pide usuario y clave:
 
-- **En su máquina** (`APP_ENV=desarrollo` y `ADMIN_CLAVE=cambiar-esto`): usuario `admin`, clave `coffeedevs-demo`. La página de acceso las muestra.
+- **En su máquina** (`APP_ENV=desarrollo` y `ADMIN_CLAVE=cambiar-esto`): usuario `admin`, clave `coffeedevs-demo`.
 - **En el servidor del evento:** ponga `APP_ENV=evento` y una `ADMIN_CLAVE` propia en el `.env` del servidor (nunca en el repositorio). Sin clave propia y fuera de `desarrollo`, el panel queda cerrado. Tras cambiar `.env`: `docker compose up -d backend`.
 
 Qué trae el panel:
