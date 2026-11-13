@@ -21,7 +21,7 @@ import {
 // calendario de vencimientos y respuestas enviadas.
 
 const VISTAS = [
-  { clave: 'bandeja', etiqueta: 'Bandeja por vencimiento' },
+  { clave: 'bandeja', etiqueta: 'Bandeja' },
   { clave: 'calendario', etiqueta: 'Calendario' },
   { clave: 'enviadas', etiqueta: 'Enviadas' },
 ]
@@ -29,34 +29,61 @@ const FILTROS_VACIOS = { q: '', area: '', tipo: '', semaforo: '', estado: '', ri
 const DIAS_SEMANA = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes']
 const SEMANAS_MAXIMAS = 6
 
-function Tarjetas({ metricas }) {
+// Resumen del panel. Las cuatro cifras son atajos: llevan a la bandeja ya filtrada.
+function Resumen({ metricas, onAtajo }) {
   const { tarjetas, presupuesto_ia: gasto } = metricas
   const porcentaje = Math.min(100, (gasto.total_usd / gasto.tope_usd) * 100)
+  const vencidas = metricas.por_semaforo.vencidas
+  const cifras = [
+    {
+      clave: 'activas',
+      cifra: tarjetas.activas,
+      nombre: 'Activas',
+      nota: `${tarjetas.con_borrador_listo} con borrador listo`,
+      destino: 'Ver todas en la bandeja',
+    },
+    {
+      clave: 'urgentes',
+      cifra: tarjetas.por_vencer,
+      nombre: 'En rojo o vencidas',
+      nota: `${vencidas} ya vencida${vencidas === 1 ? '' : 's'}`,
+      destino: 'Ver solo las urgentes',
+      alerta: tarjetas.por_vencer > 0,
+    },
+    {
+      clave: 'revision',
+      cifra: tarjetas.pendientes_revision,
+      nombre: 'Clasificación por revisar',
+      nota: `${tarjetas.riesgo_fraude} con riesgo de fraude`,
+      destino: 'Ver las que piden revisión',
+    },
+    {
+      clave: 'respondidas',
+      cifra: tarjetas.respondidas,
+      nombre: 'Respondidas',
+      nota: 'Aprobadas por una persona',
+      destino: 'Ver las enviadas',
+    },
+  ]
   return (
     <ul className="resumen">
-      <li className="tarjeta tarjeta--tecnica resumen__tarjeta">
-        <span className="resumen__cifra">{tarjetas.activas}</span>
-        <span className="resumen__nombre">Activas</span>
-        <span className="resumen__nota texto-apoyo">{tarjetas.con_borrador_listo} con borrador listo</span>
-      </li>
-      <li className="tarjeta tarjeta--tecnica resumen__tarjeta" data-alerta={tarjetas.por_vencer > 0}>
-        <span className="resumen__cifra">{tarjetas.por_vencer}</span>
-        <span className="resumen__nombre">En rojo o vencidas</span>
-        <span className="resumen__nota texto-apoyo">
-          {metricas.por_semaforo.vencidas} ya vencida{metricas.por_semaforo.vencidas === 1 ? '' : 's'}
-        </span>
-      </li>
-      <li className="tarjeta tarjeta--tecnica resumen__tarjeta">
-        <span className="resumen__cifra">{tarjetas.pendientes_revision}</span>
-        <span className="resumen__nombre">Clasificación por revisar</span>
-        <span className="resumen__nota texto-apoyo">{tarjetas.riesgo_fraude} con riesgo de fraude</span>
-      </li>
-      <li className="tarjeta tarjeta--tecnica resumen__tarjeta">
-        <span className="resumen__cifra">{tarjetas.respondidas}</span>
-        <span className="resumen__nombre">Respondidas</span>
-        <span className="resumen__nota texto-apoyo">Aprobadas por una persona</span>
-      </li>
-      <li className="tarjeta tarjeta--grafito resumen__tarjeta resumen__tarjeta--gasto">
+      {cifras.map((dato) => (
+        <li key={dato.clave} className="resumen__celda">
+          <button
+            type="button"
+            className="resumen__atajo"
+            data-alerta={Boolean(dato.alerta)}
+            title={dato.destino}
+            onClick={() => onAtajo(dato.clave)}
+          >
+            <span className="resumen__cifra">{dato.cifra}</span>
+            <span className="resumen__nombre">{dato.nombre}</span>
+            <span className="resumen__nota">{dato.nota}</span>
+            <span className="solo-lectores">. {dato.destino}</span>
+          </button>
+        </li>
+      ))}
+      <li className="resumen__celda resumen__gasto">
         <span className="resumen__cifra">
           {gasto.total_usd.toLocaleString('es-CO', { style: 'currency', currency: 'USD' })}
         </span>
@@ -80,13 +107,17 @@ function Tarjetas({ metricas }) {
   )
 }
 
+const SELECTORES = ['semaforo', 'area', 'tipo', 'estado', 'riesgo_fraude']
+
 function Filtros({ filtros, opciones, onCambio }) {
+  // En el teléfono los selectores se pliegan; en pantallas anchas siempre se ven (CSS).
+  const [abiertos, setAbiertos] = useState(false)
   const cambiar = (clave) => (evento) => onCambio({ ...filtros, [clave]: evento.target.value })
-  const hayFiltros = Object.values(filtros).some(Boolean)
+  const activos = SELECTORES.filter((clave) => filtros[clave]).length
   return (
     <form className="filtros" onSubmit={(e) => e.preventDefault()} role="search">
-      <div className="filtros__campo filtros__campo--ancho">
-        <label htmlFor="filtro-q" className="campo__etiqueta">Buscar</label>
+      <div className="filtros__campo filtros__buscar">
+        <label htmlFor="filtro-q" className="filtros__etiqueta">Buscar</label>
         <input
           id="filtro-q"
           type="search"
@@ -97,51 +128,58 @@ function Filtros({ filtros, opciones, onCambio }) {
           onChange={cambiar('q')}
         />
       </div>
-      <div className="filtros__campo">
-        <label htmlFor="filtro-semaforo" className="campo__etiqueta">Semáforo</label>
-        <select id="filtro-semaforo" className="campo__control" value={filtros.semaforo} onChange={cambiar('semaforo')}>
-          <option value="">Todos</option>
-          <option value="rojo">Urgente o vencida</option>
-          <option value="amarillo">Por vencer</option>
-          <option value="verde">A tiempo</option>
-        </select>
+      <button
+        type="button"
+        className="boton boton--linea filtros__plegar"
+        aria-expanded={abiertos}
+        aria-controls="filtros-selectores"
+        onClick={() => setAbiertos((valor) => !valor)}
+      >
+        {abiertos ? 'Ocultar filtros' : 'Filtros'}
+        {activos > 0 && <span className="pestanas__conteo">{activos}</span>}
+      </button>
+      <div id="filtros-selectores" className="filtros__selectores" data-abierto={abiertos}>
+        <div className="filtros__campo">
+          <label htmlFor="filtro-semaforo" className="filtros__etiqueta">Semáforo</label>
+          <select id="filtro-semaforo" className="campo__control" value={filtros.semaforo} onChange={cambiar('semaforo')}>
+            <option value="">Todos</option>
+            <option value="rojo">Urgente o vencida</option>
+            <option value="amarillo">Por vencer</option>
+            <option value="verde">A tiempo</option>
+          </select>
+        </div>
+        <div className="filtros__campo">
+          <label htmlFor="filtro-area" className="filtros__etiqueta">Área</label>
+          <select id="filtro-area" className="campo__control" value={filtros.area} onChange={cambiar('area')}>
+            <option value="">Todas</option>
+            {opciones.areas.map((area) => <option key={area}>{area}</option>)}
+          </select>
+        </div>
+        <div className="filtros__campo">
+          <label htmlFor="filtro-tipo" className="filtros__etiqueta">Tipo</label>
+          <select id="filtro-tipo" className="campo__control" value={filtros.tipo} onChange={cambiar('tipo')}>
+            <option value="">Todos</option>
+            {opciones.tipos.map((tipo) => <option key={tipo} value={tipo}>{etiquetaTipo(tipo)}</option>)}
+          </select>
+        </div>
+        <div className="filtros__campo">
+          <label htmlFor="filtro-estado" className="filtros__etiqueta">Estado</label>
+          <select id="filtro-estado" className="campo__control" value={filtros.estado} onChange={cambiar('estado')}>
+            <option value="">Activas</option>
+            {opciones.estados
+              .filter((estado) => estado !== 'respondida')
+              .map((estado) => <option key={estado} value={estado}>{ETIQUETAS_ESTADO[estado]}</option>)}
+          </select>
+        </div>
+        <div className="filtros__campo">
+          <label htmlFor="filtro-fraude" className="filtros__etiqueta">Riesgo de fraude</label>
+          <select id="filtro-fraude" className="campo__control" value={filtros.riesgo_fraude} onChange={cambiar('riesgo_fraude')}>
+            <option value="">Todos</option>
+            <option value="true">Con riesgo</option>
+            <option value="false">Sin riesgo</option>
+          </select>
+        </div>
       </div>
-      <div className="filtros__campo">
-        <label htmlFor="filtro-area" className="campo__etiqueta">Área</label>
-        <select id="filtro-area" className="campo__control" value={filtros.area} onChange={cambiar('area')}>
-          <option value="">Todas</option>
-          {opciones.areas.map((area) => <option key={area}>{area}</option>)}
-        </select>
-      </div>
-      <div className="filtros__campo">
-        <label htmlFor="filtro-tipo" className="campo__etiqueta">Tipo</label>
-        <select id="filtro-tipo" className="campo__control" value={filtros.tipo} onChange={cambiar('tipo')}>
-          <option value="">Todos</option>
-          {opciones.tipos.map((tipo) => <option key={tipo} value={tipo}>{etiquetaTipo(tipo)}</option>)}
-        </select>
-      </div>
-      <div className="filtros__campo">
-        <label htmlFor="filtro-estado" className="campo__etiqueta">Estado</label>
-        <select id="filtro-estado" className="campo__control" value={filtros.estado} onChange={cambiar('estado')}>
-          <option value="">Todas las activas</option>
-          {opciones.estados
-            .filter((estado) => estado !== 'respondida')
-            .map((estado) => <option key={estado} value={estado}>{ETIQUETAS_ESTADO[estado]}</option>)}
-        </select>
-      </div>
-      <div className="filtros__campo">
-        <label htmlFor="filtro-fraude" className="campo__etiqueta">Riesgo de fraude</label>
-        <select id="filtro-fraude" className="campo__control" value={filtros.riesgo_fraude} onChange={cambiar('riesgo_fraude')}>
-          <option value="">Todos</option>
-          <option value="true">Con riesgo</option>
-          <option value="false">Sin riesgo</option>
-        </select>
-      </div>
-      {hayFiltros && (
-        <button type="button" className="boton boton--linea filtros__limpiar" onClick={() => onCambio(FILTROS_VACIOS)}>
-          Quitar filtros
-        </button>
-      )}
     </form>
   )
 }
@@ -158,6 +196,8 @@ function Alertas({ item }) {
   )
 }
 
+// En el teléfono cada fila se muestra como ficha (admin.css): data-etiqueta
+// repone el nombre de la columna que ya no se ve.
 function TablaBandeja({ items }) {
   return (
     <div className="tabla-envoltura">
@@ -176,16 +216,16 @@ function TablaBandeja({ items }) {
         <tbody>
           {items.map((item) => (
             <tr key={item.radicado}>
-              <td><Semaforo item={item} /></td>
-              <td>
+              <td className="tabla__semaforo"><Semaforo item={item} /></td>
+              <td className="tabla__principal">
                 <Link className="tabla__radicado" to={`/admin/pqrsd/${item.radicado}`}>{item.radicado}</Link>
                 <span className="tabla__asunto">{item.asunto}</span>
                 <Alertas item={item} />
               </td>
-              <td>{etiquetaTipo(item.tipo)}</td>
-              <td>{item.area || 'Sin área'}</td>
-              <td className="tabla__fecha">{formatearFecha(item.fecha_vencimiento)}</td>
-              <td>{ETIQUETAS_ESTADO[item.estado]}</td>
+              <td data-etiqueta="Tipo">{etiquetaTipo(item.tipo)}</td>
+              <td data-etiqueta="Área">{item.area || 'Sin área'}</td>
+              <td data-etiqueta="Vence" className="tabla__fecha">{formatearFecha(item.fecha_vencimiento)}</td>
+              <td className="tabla__estado">{ETIQUETAS_ESTADO[item.estado]}</td>
             </tr>
           ))}
         </tbody>
@@ -211,14 +251,14 @@ function TablaEnviadas({ items }) {
         <tbody>
           {items.map((item) => (
             <tr key={item.radicado}>
-              <td>
+              <td className="tabla__principal">
                 <Link className="tabla__radicado" to={`/admin/pqrsd/${item.radicado}`}>{item.radicado}</Link>
                 <span className="tabla__asunto">{item.asunto}</span>
               </td>
-              <td>{etiquetaTipo(item.tipo)}</td>
-              <td>{item.area || 'Sin área'}</td>
-              <td className="tabla__fecha">{formatearFecha(item.fecha_radicacion)}</td>
-              <td className="tabla__fecha">{formatearFechaHora(item.fecha_respuesta)}</td>
+              <td data-etiqueta="Tipo">{etiquetaTipo(item.tipo)}</td>
+              <td data-etiqueta="Área">{item.area || 'Sin área'}</td>
+              <td data-etiqueta="Radicada" className="tabla__fecha">{formatearFecha(item.fecha_radicacion)}</td>
+              <td data-etiqueta="Respondida" className="tabla__fecha">{formatearFechaHora(item.fecha_respuesta)}</td>
             </tr>
           ))}
         </tbody>
@@ -400,7 +440,19 @@ export default function AdminPanel() {
     navegar('/admin/login', { replace: true })
   }
 
-  const hayFiltros = Object.values(busqueda).some(Boolean)
+  // Cada cifra del resumen abre la vista que la explica.
+  function irDesdeResumen(clave) {
+    if (clave === 'respondidas') {
+      setVista('enviadas')
+      return
+    }
+    setVista('bandeja')
+    if (clave === 'urgentes') setFiltros({ ...FILTROS_VACIOS, semaforo: 'rojo' })
+    else if (clave === 'revision') setFiltros({ ...FILTROS_VACIOS, estado: 'pendiente_revision_clasificacion' })
+    else setFiltros(FILTROS_VACIOS)
+  }
+
+  const hayFiltros = Object.values(filtros).some(Boolean)
 
   return (
     <div className="contenedor pagina admin">
@@ -425,7 +477,7 @@ export default function AdminPanel() {
       )}
 
       {metricas ? (
-        <Tarjetas metricas={metricas} />
+        <Resumen metricas={metricas} onAtajo={irDesdeResumen} />
       ) : (
         !error && <p className="vacio texto-apoyo" role="status">Cargando el resumen…</p>
       )}
@@ -454,6 +506,21 @@ export default function AdminPanel() {
           <>
             {bandeja && <Filtros filtros={filtros} opciones={bandeja.opciones} onCambio={setFiltros} />}
             {!bandeja && !error && <p className="vacio texto-apoyo" role="status">Cargando la bandeja…</p>}
+            {bandeja && (
+              <div className="resultado">
+                <p role="status">
+                  <strong>{bandeja.items.length}</strong>{' '}
+                  {bandeja.items.length === 1 ? 'PQRSD activa' : 'PQRSD activas'}
+                  {hayFiltros ? ' con estos filtros' : ''}
+                  <span className="texto-apoyo"> · de la más urgente a la menos urgente</span>
+                </p>
+                {hayFiltros && (
+                  <button type="button" className="enlace resultado__quitar" onClick={() => setFiltros(FILTROS_VACIOS)}>
+                    Quitar filtros
+                  </button>
+                )}
+              </div>
+            )}
             {bandeja && bandeja.items.length > 0 && <TablaBandeja items={bandeja.items} />}
             {bandeja && bandeja.items.length === 0 && (
               <p className="vacio texto-apoyo">
