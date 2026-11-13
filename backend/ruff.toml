@@ -1,0 +1,8 @@
+# Reglas explícitas para que el lint no cambie al actualizar ruff.
+target-version = "py312"
+line-length = 100
+
+[lint]
+# E/W: estilo básico; F: errores reales (nombres sin definir, imports sin usar);
+# I: orden de imports; B: errores comunes; UP: sintaxis moderna de Python.
+select = ["E", "W", "F", "I", "B", "UP"]

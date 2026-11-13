@@ -1,0 +1,5 @@
+# Dependencias solo para pruebas y CI (no entran a la imagen Docker).
+-r requirements.txt
+pytest==9.2.0
+httpx==0.28.1  # lo usa el TestClient de FastAPI
+ruff==0.17.4

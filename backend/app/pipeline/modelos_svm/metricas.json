@@ -1,0 +1,806 @@
+{
+  "area": {
+    "capa": "area",
+    "etiqueta": "area",
+    "clases": [
+      "cartera",
+      "fuera_de_competencia",
+      "juridica",
+      "seguros",
+      "tarjetas"
+    ],
+    "c": 0.05,
+    "convergio": true,
+    "vocabulario": {
+      "max_palabras": 2000,
+      "min_df_palabras": 5,
+      "max_caracteres": 4000,
+      "min_df_caracteres": 10
+    },
+    "f1_macro_val_por_c": {
+      "0.05": 0.8152
+    },
+    "n_train": 3702,
+    "n_test": 649,
+    "f1_macro_test": 0.767,
+    "exactitud_test": 0.7904,
+    "por_clase": {
+      "cartera": {
+        "precision": 0.734,
+        "recall": 0.724,
+        "f1-score": 0.729,
+        "support": 145.0
+      },
+      "fuera_de_competencia": {
+        "precision": 0.98,
+        "recall": 0.993,
+        "f1-score": 0.987,
+        "support": 149.0
+      },
+      "juridica": {
+        "precision": 0.791,
+        "recall": 0.767,
+        "f1-score": 0.779,
+        "support": 133.0
+      },
+      "seguros": {
+        "precision": 0.586,
+        "recall": 0.562,
+        "f1-score": 0.573,
+        "support": 73.0
+      },
+      "tarjetas": {
+        "precision": 0.75,
+        "recall": 0.785,
+        "f1-score": 0.767,
+        "support": 149.0
+      }
+    },
+    "matriz_confusion": {
+      "clases": [
+        "cartera",
+        "fuera_de_competencia",
+        "juridica",
+        "seguros",
+        "tarjetas"
+      ],
+      "valores": [
+        [
+          105,
+          0,
+          25,
+          4,
+          11
+        ],
+        [
+          0,
+          148,
+          0,
+          0,
+          1
+        ],
+        [
+          24,
+          2,
+          102,
+          2,
+          3
+        ],
+        [
+          7,
+          0,
+          1,
+          41,
+          24
+        ],
+        [
+          7,
+          1,
+          1,
+          23,
+          117
+        ]
+      ]
+    },
+    "acierto_por_fuente": {
+      "banking77": 1.0,
+      "cfpb": 0.68,
+      "datos_gov_contraloria_valle": 1.0,
+      "datos_gov_contraloria_villavicencio": 1.0,
+      "datos_gov_flandes": 1.0,
+      "datos_gov_mindeporte": 0.971
+    },
+    "umbrales_confianza": {
+      "0.5": {
+        "cobertura": 0.918,
+        "precision": 0.829
+      },
+      "0.6": {
+        "cobertura": 0.78,
+        "precision": 0.885
+      },
+      "0.7": {
+        "cobertura": 0.672,
+        "precision": 0.904
+      },
+      "0.8": {
+        "cobertura": 0.536,
+        "precision": 0.951
+      },
+      "0.9": {
+        "cobertura": 0.327,
+        "precision": 0.986
+      }
+    },
+    "entrenado_en": "2026-11-13"
+  },
+  "fraude": {
+    "capa": "fraude",
+    "etiqueta": "fraude",
+    "clases": [
+      "no",
+      "si"
+    ],
+    "c": 0.2,
+    "convergio": true,
+    "f1_macro_val_por_c": {
+      "0.05": 0.8141,
+      "0.2": 0.8274,
+      "1.0": 0.7964
+    },
+    "n_train": 1286,
+    "n_test": 226,
+    "f1_macro_test": 0.8097,
+    "exactitud_test": 0.8097,
+    "por_clase": {
+      "no": {
+        "precision": 0.807,
+        "recall": 0.814,
+        "f1-score": 0.811,
+        "support": 113.0
+      },
+      "si": {
+        "precision": 0.812,
+        "recall": 0.805,
+        "f1-score": 0.809,
+        "support": 113.0
+      }
+    },
+    "matriz_confusion": {
+      "clases": [
+        "no",
+        "si"
+      ],
+      "valores": [
+        [
+          92,
+          21
+        ],
+        [
+          22,
+          91
+        ]
+      ]
+    },
+    "acierto_por_fuente": {
+      "banking77": 0.896,
+      "cfpb": 0.787
+    },
+    "umbrales_confianza": {
+      "0.5": {
+        "cobertura": 1.0,
+        "precision": 0.81
+      },
+      "0.6": {
+        "cobertura": 0.867,
+        "precision": 0.852
+      },
+      "0.7": {
+        "cobertura": 0.735,
+        "precision": 0.88
+      },
+      "0.8": {
+        "cobertura": 0.527,
+        "precision": 0.916
+      },
+      "0.9": {
+        "cobertura": 0.283,
+        "precision": 0.938
+      }
+    },
+    "entrenado_en": "2026-11-13"
+  },
+  "sentimiento": {
+    "capa": "sentimiento",
+    "etiqueta": "sentimiento",
+    "clases": [
+      "negativo",
+      "neutral",
+      "positivo"
+    ],
+    "c": 0.2,
+    "convergio": true,
+    "vocabulario": {
+      "max_palabras": 2000,
+      "min_df_palabras": 5,
+      "max_caracteres": 4000,
+      "min_df_caracteres": 10
+    },
+    "f1_macro_val_por_c": {
+      "0.2": 0.8019
+    },
+    "n_train": 7076,
+    "n_test": 1246,
+    "f1_macro_test": 0.7903,
+    "exactitud_test": 0.7769,
+    "por_clase": {
+      "negativo": {
+        "precision": 0.733,
+        "recall": 0.735,
+        "f1-score": 0.734,
+        "support": 449.0
+      },
+      "neutral": {
+        "precision": 0.691,
+        "recall": 0.771,
+        "f1-score": 0.728,
+        "support": 449.0
+      },
+      "positivo": {
+        "precision": 0.99,
+        "recall": 0.839,
+        "f1-score": 0.908,
+        "support": 348.0
+      }
+    },
+    "matriz_confusion": {
+      "clases": [
+        "negativo",
+        "neutral",
+        "positivo"
+      ],
+      "valores": [
+        [
+          330,
+          118,
+          1
+        ],
+        [
+          101,
+          346,
+          2
+        ],
+        [
+          19,
+          37,
+          292
+        ]
+      ]
+    },
+    "acierto_por_fuente": {
+      "amazon_es": 0.856,
+      "banking77": 0.785,
+      "cfpb": 0.171,
+      "datos_gov_contraloria_valle": 0.614,
+      "datos_gov_contraloria_villavicencio": 0.745,
+      "datos_gov_flandes": 0.769,
+      "datos_gov_mindeporte": 0.883
+    },
+    "umbrales_confianza": {
+      "0.5": {
+        "cobertura": 0.95,
+        "precision": 0.795
+      },
+      "0.6": {
+        "cobertura": 0.778,
+        "precision": 0.852
+      },
+      "0.7": {
+        "cobertura": 0.566,
+        "precision": 0.896
+      },
+      "0.8": {
+        "cobertura": 0.338,
+        "precision": 0.936
+      },
+      "0.9": {
+        "cobertura": 0.127,
+        "precision": 0.956
+      }
+    },
+    "entrenado_en": "2026-11-13"
+  },
+  "tema_cartera": {
+    "capa": "tema_cartera",
+    "etiqueta": "tema",
+    "clases": [
+      "acuerdos_de_pago",
+      "cobranza",
+      "reporte_centrales_riesgo",
+      "saldo_paz_y_salvo"
+    ],
+    "c": 0.2,
+    "convergio": true,
+    "f1_macro_val_por_c": {
+      "0.05": 0.6857,
+      "0.2": 0.6961,
+      "1.0": 0.6525
+    },
+    "n_train": 824,
+    "n_test": 143,
+    "f1_macro_test": 0.6225,
+    "exactitud_test": 0.6294,
+    "por_clase": {
+      "acuerdos_de_pago": {
+        "precision": 0.795,
+        "recall": 0.861,
+        "f1-score": 0.827,
+        "support": 36.0
+      },
+      "cobranza": {
+        "precision": 0.6,
+        "recall": 0.5,
+        "f1-score": 0.545,
+        "support": 36.0
+      },
+      "reporte_centrales_riesgo": {
+        "precision": 0.568,
+        "recall": 0.714,
+        "f1-score": 0.633,
+        "support": 35.0
+      },
+      "saldo_paz_y_salvo": {
+        "precision": 0.533,
+        "recall": 0.444,
+        "f1-score": 0.485,
+        "support": 36.0
+      }
+    },
+    "matriz_confusion": {
+      "clases": [
+        "acuerdos_de_pago",
+        "cobranza",
+        "reporte_centrales_riesgo",
+        "saldo_paz_y_salvo"
+      ],
+      "valores": [
+        [
+          31,
+          2,
+          2,
+          1
+        ],
+        [
+          2,
+          18,
+          7,
+          9
+        ],
+        [
+          5,
+          1,
+          25,
+          4
+        ],
+        [
+          1,
+          9,
+          10,
+          16
+        ]
+      ]
+    },
+    "acierto_por_fuente": {
+      "cfpb": 0.629
+    },
+    "umbrales_confianza": {
+      "0.5": {
+        "cobertura": 0.643,
+        "precision": 0.739
+      },
+      "0.6": {
+        "cobertura": 0.441,
+        "precision": 0.825
+      },
+      "0.7": {
+        "cobertura": 0.273,
+        "precision": 0.897
+      },
+      "0.8": {
+        "cobertura": 0.056,
+        "precision": 1.0
+      },
+      "0.9": {
+        "cobertura": 0.0,
+        "precision": null
+      }
+    },
+    "entrenado_en": "2026-11-13"
+  },
+  "tema_juridica": {
+    "capa": "tema_juridica",
+    "etiqueta": "tema",
+    "clases": [
+      "suplantacion_identidad",
+      "uso_indebido_datos"
+    ],
+    "c": 0.05,
+    "convergio": true,
+    "f1_macro_val_por_c": {
+      "0.05": 0.9111,
+      "0.2": 0.9111,
+      "1.0": 0.8888
+    },
+    "n_train": 512,
+    "n_test": 88,
+    "f1_macro_test": 0.7495,
+    "exactitud_test": 0.75,
+    "por_clase": {
+      "suplantacion_identidad": {
+        "precision": 0.729,
+        "recall": 0.795,
+        "f1-score": 0.761,
+        "support": 44.0
+      },
+      "uso_indebido_datos": {
+        "precision": 0.775,
+        "recall": 0.705,
+        "f1-score": 0.738,
+        "support": 44.0
+      }
+    },
+    "matriz_confusion": {
+      "clases": [
+        "suplantacion_identidad",
+        "uso_indebido_datos"
+      ],
+      "valores": [
+        [
+          35,
+          9
+        ],
+        [
+          13,
+          31
+        ]
+      ]
+    },
+    "acierto_por_fuente": {
+      "cfpb": 0.75
+    },
+    "umbrales_confianza": {
+      "0.5": {
+        "cobertura": 1.0,
+        "precision": 0.75
+      },
+      "0.6": {
+        "cobertura": 0.864,
+        "precision": 0.789
+      },
+      "0.7": {
+        "cobertura": 0.75,
+        "precision": 0.848
+      },
+      "0.8": {
+        "cobertura": 0.523,
+        "precision": 0.891
+      },
+      "0.9": {
+        "cobertura": 0.239,
+        "precision": 0.905
+      }
+    },
+    "entrenado_en": "2026-11-13"
+  },
+  "tema_tarjetas": {
+    "capa": "tema_tarjetas",
+    "etiqueta": "tema",
+    "clases": [
+      "atencion_y_canales",
+      "cancelacion",
+      "cobros_comisiones_intereses",
+      "entrega_activacion_bloqueo",
+      "pagos",
+      "transaccion_mal_aplicada",
+      "transaccion_no_reconocida"
+    ],
+    "c": 0.2,
+    "convergio": true,
+    "vocabulario": {
+      "max_palabras": 2000,
+      "min_df_palabras": 5,
+      "max_caracteres": 4000,
+      "min_df_caracteres": 10
+    },
+    "f1_macro_val_por_c": {
+      "0.2": 0.7185
+    },
+    "n_train": 1441,
+    "n_test": 248,
+    "f1_macro_test": 0.7826,
+    "exactitud_test": 0.8024,
+    "por_clase": {
+      "atencion_y_canales": {
+        "precision": 0.765,
+        "recall": 0.812,
+        "f1-score": 0.788,
+        "support": 32.0
+      },
+      "cancelacion": {
+        "precision": 0.676,
+        "recall": 0.885,
+        "f1-score": 0.767,
+        "support": 26.0
+      },
+      "cobros_comisiones_intereses": {
+        "precision": 0.824,
+        "recall": 0.718,
+        "f1-score": 0.767,
+        "support": 39.0
+      },
+      "entrega_activacion_bloqueo": {
+        "precision": 0.949,
+        "recall": 0.841,
+        "f1-score": 0.892,
+        "support": 44.0
+      },
+      "pagos": {
+        "precision": 0.647,
+        "recall": 0.55,
+        "f1-score": 0.595,
+        "support": 20.0
+      },
+      "transaccion_mal_aplicada": {
+        "precision": 0.8,
+        "recall": 0.909,
+        "f1-score": 0.851,
+        "support": 44.0
+      },
+      "transaccion_no_reconocida": {
+        "precision": 0.85,
+        "recall": 0.791,
+        "f1-score": 0.819,
+        "support": 43.0
+      }
+    },
+    "matriz_confusion": {
+      "clases": [
+        "atencion_y_canales",
+        "cancelacion",
+        "cobros_comisiones_intereses",
+        "entrega_activacion_bloqueo",
+        "pagos",
+        "transaccion_mal_aplicada",
+        "transaccion_no_reconocida"
+      ],
+      "valores": [
+        [
+          26,
+          0,
+          2,
+          1,
+          2,
+          1,
+          0
+        ],
+        [
+          0,
+          23,
+          1,
+          0,
+          1,
+          0,
+          1
+        ],
+        [
+          3,
+          3,
+          28,
+          0,
+          1,
+          1,
+          3
+        ],
+        [
+          2,
+          3,
+          0,
+          37,
+          0,
+          2,
+          0
+        ],
+        [
+          0,
+          3,
+          2,
+          0,
+          11,
+          4,
+          0
+        ],
+        [
+          1,
+          0,
+          1,
+          0,
+          0,
+          40,
+          2
+        ],
+        [
+          2,
+          2,
+          0,
+          1,
+          2,
+          2,
+          34
+        ]
+      ]
+    },
+    "acierto_por_fuente": {
+      "banking77": 0.943,
+      "cfpb": 0.667
+    },
+    "umbrales_confianza": {
+      "0.5": {
+        "cobertura": 0.782,
+        "precision": 0.897
+      },
+      "0.6": {
+        "cobertura": 0.605,
+        "precision": 0.927
+      },
+      "0.7": {
+        "cobertura": 0.448,
+        "precision": 0.955
+      },
+      "0.8": {
+        "cobertura": 0.294,
+        "precision": 0.986
+      },
+      "0.9": {
+        "cobertura": 0.089,
+        "precision": 1.0
+      }
+    },
+    "entrenado_en": "2026-11-13"
+  },
+  "tipo": {
+    "capa": "tipo",
+    "etiqueta": "tipo",
+    "clases": [
+      "denuncia",
+      "peticion",
+      "queja",
+      "reclamo",
+      "sugerencia"
+    ],
+    "c": 0.2,
+    "convergio": true,
+    "vocabulario": {
+      "max_palabras": 2000,
+      "min_df_palabras": 5,
+      "max_caracteres": 4000,
+      "min_df_caracteres": 10
+    },
+    "f1_macro_val_por_c": {
+      "0.2": 0.7359
+    },
+    "n_train": 3917,
+    "n_test": 686,
+    "f1_macro_test": 0.6501,
+    "exactitud_test": 0.6385,
+    "por_clase": {
+      "denuncia": {
+        "precision": 0.803,
+        "recall": 0.846,
+        "f1-score": 0.824,
+        "support": 149.0
+      },
+      "peticion": {
+        "precision": 0.578,
+        "recall": 0.597,
+        "f1-score": 0.587,
+        "support": 149.0
+      },
+      "queja": {
+        "precision": 0.514,
+        "recall": 0.51,
+        "f1-score": 0.512,
+        "support": 149.0
+      },
+      "reclamo": {
+        "precision": 0.534,
+        "recall": 0.47,
+        "f1-score": 0.5,
+        "support": 149.0
+      },
+      "sugerencia": {
+        "precision": 0.802,
+        "recall": 0.856,
+        "f1-score": 0.828,
+        "support": 90.0
+      }
+    },
+    "matriz_confusion": {
+      "clases": [
+        "denuncia",
+        "peticion",
+        "queja",
+        "reclamo",
+        "sugerencia"
+      ],
+      "valores": [
+        [
+          126,
+          7,
+          9,
+          7,
+          0
+        ],
+        [
+          10,
+          89,
+          39,
+          10,
+          1
+        ],
+        [
+          5,
+          26,
+          76,
+          34,
+          8
+        ],
+        [
+          15,
+          31,
+          23,
+          70,
+          10
+        ],
+        [
+          1,
+          1,
+          1,
+          10,
+          77
+        ]
+      ]
+    },
+    "acierto_por_fuente": {
+      "amazon_es": 0.733,
+      "banking77": 0.684,
+      "cfpb": 0.462,
+      "datos_gov_contraloria_valle": 0.912,
+      "datos_gov_contraloria_villavicencio": 0.814,
+      "datos_gov_flandes": 0.552,
+      "datos_gov_mindeporte": 0.553
+    },
+    "umbrales_confianza": {
+      "0.5": {
+        "cobertura": 0.751,
+        "precision": 0.732
+      },
+      "0.6": {
+        "cobertura": 0.544,
+        "precision": 0.802
+      },
+      "0.7": {
+        "cobertura": 0.376,
+        "precision": 0.864
+      },
+      "0.8": {
+        "cobertura": 0.219,
+        "precision": 0.933
+      },
+      "0.9": {
+        "cobertura": 0.054,
+        "precision": 1.0
+      }
+    },
+    "entrenado_en": "2026-11-13"
+  }
+}

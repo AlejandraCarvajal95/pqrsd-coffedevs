@@ -1,0 +1,613 @@
+{
+  "tipo": {
+    "mejor": {
+      "vocabulario": "muy_reducido",
+      "c": 0.2,
+      "f1_train": 0.9246,
+      "f1_val": 0.7359,
+      "brecha": 0.1887,
+      "parametros": {
+        "max_palabras": 2000,
+        "min_df_palabras": 5,
+        "max_caracteres": 4000,
+        "min_df_caracteres": 10
+      }
+    },
+    "todas": [
+      {
+        "vocabulario": "actual",
+        "c": 0.005,
+        "f1_train": 0.7411,
+        "f1_val": 0.6974,
+        "brecha": 0.0437
+      },
+      {
+        "vocabulario": "actual",
+        "c": 0.01,
+        "f1_train": 0.7696,
+        "f1_val": 0.7109,
+        "brecha": 0.0587
+      },
+      {
+        "vocabulario": "actual",
+        "c": 0.02,
+        "f1_train": 0.8026,
+        "f1_val": 0.7297,
+        "brecha": 0.073
+      },
+      {
+        "vocabulario": "actual",
+        "c": 0.05,
+        "f1_train": 0.8589,
+        "f1_val": 0.7317,
+        "brecha": 0.1271
+      },
+      {
+        "vocabulario": "actual",
+        "c": 0.2,
+        "f1_train": 0.9563,
+        "f1_val": 0.7369,
+        "brecha": 0.2194
+      },
+      {
+        "vocabulario": "reducido",
+        "c": 0.005,
+        "f1_train": 0.7455,
+        "f1_val": 0.7032,
+        "brecha": 0.0423
+      },
+      {
+        "vocabulario": "reducido",
+        "c": 0.01,
+        "f1_train": 0.7707,
+        "f1_val": 0.7163,
+        "brecha": 0.0545
+      },
+      {
+        "vocabulario": "reducido",
+        "c": 0.02,
+        "f1_train": 0.8036,
+        "f1_val": 0.7345,
+        "brecha": 0.069
+      },
+      {
+        "vocabulario": "reducido",
+        "c": 0.05,
+        "f1_train": 0.8531,
+        "f1_val": 0.7321,
+        "brecha": 0.121
+      },
+      {
+        "vocabulario": "reducido",
+        "c": 0.2,
+        "f1_train": 0.9446,
+        "f1_val": 0.7404,
+        "brecha": 0.2041
+      },
+      {
+        "vocabulario": "muy_reducido",
+        "c": 0.005,
+        "f1_train": 0.7456,
+        "f1_val": 0.7058,
+        "brecha": 0.0399
+      },
+      {
+        "vocabulario": "muy_reducido",
+        "c": 0.01,
+        "f1_train": 0.7701,
+        "f1_val": 0.7157,
+        "brecha": 0.0544
+      },
+      {
+        "vocabulario": "muy_reducido",
+        "c": 0.02,
+        "f1_train": 0.8051,
+        "f1_val": 0.7325,
+        "brecha": 0.0727
+      },
+      {
+        "vocabulario": "muy_reducido",
+        "c": 0.05,
+        "f1_train": 0.8484,
+        "f1_val": 0.7314,
+        "brecha": 0.117
+      },
+      {
+        "vocabulario": "muy_reducido",
+        "c": 0.2,
+        "f1_train": 0.9246,
+        "f1_val": 0.7359,
+        "brecha": 0.1887
+      }
+    ]
+  },
+  "area": {
+    "mejor": {
+      "vocabulario": "muy_reducido",
+      "c": 0.05,
+      "f1_train": 0.8751,
+      "f1_val": 0.8152,
+      "brecha": 0.0599,
+      "parametros": {
+        "max_palabras": 2000,
+        "min_df_palabras": 5,
+        "max_caracteres": 4000,
+        "min_df_caracteres": 10
+      }
+    },
+    "todas": [
+      {
+        "vocabulario": "actual",
+        "c": 0.005,
+        "f1_train": 0.7998,
+        "f1_val": 0.7823,
+        "brecha": 0.0176
+      },
+      {
+        "vocabulario": "actual",
+        "c": 0.01,
+        "f1_train": 0.8188,
+        "f1_val": 0.7908,
+        "brecha": 0.028
+      },
+      {
+        "vocabulario": "actual",
+        "c": 0.02,
+        "f1_train": 0.8441,
+        "f1_val": 0.7981,
+        "brecha": 0.0461
+      },
+      {
+        "vocabulario": "actual",
+        "c": 0.05,
+        "f1_train": 0.8824,
+        "f1_val": 0.806,
+        "brecha": 0.0764
+      },
+      {
+        "vocabulario": "actual",
+        "c": 0.2,
+        "f1_train": 0.96,
+        "f1_val": 0.8078,
+        "brecha": 0.1522
+      },
+      {
+        "vocabulario": "reducido",
+        "c": 0.005,
+        "f1_train": 0.8007,
+        "f1_val": 0.7868,
+        "brecha": 0.0139
+      },
+      {
+        "vocabulario": "reducido",
+        "c": 0.01,
+        "f1_train": 0.8216,
+        "f1_val": 0.7891,
+        "brecha": 0.0325
+      },
+      {
+        "vocabulario": "reducido",
+        "c": 0.02,
+        "f1_train": 0.8463,
+        "f1_val": 0.7997,
+        "brecha": 0.0467
+      },
+      {
+        "vocabulario": "reducido",
+        "c": 0.05,
+        "f1_train": 0.8798,
+        "f1_val": 0.8073,
+        "brecha": 0.0725
+      },
+      {
+        "vocabulario": "reducido",
+        "c": 0.2,
+        "f1_train": 0.9498,
+        "f1_val": 0.8078,
+        "brecha": 0.142
+      },
+      {
+        "vocabulario": "muy_reducido",
+        "c": 0.005,
+        "f1_train": 0.8012,
+        "f1_val": 0.791,
+        "brecha": 0.0102
+      },
+      {
+        "vocabulario": "muy_reducido",
+        "c": 0.01,
+        "f1_train": 0.8209,
+        "f1_val": 0.8023,
+        "brecha": 0.0185
+      },
+      {
+        "vocabulario": "muy_reducido",
+        "c": 0.02,
+        "f1_train": 0.8444,
+        "f1_val": 0.8068,
+        "brecha": 0.0376
+      },
+      {
+        "vocabulario": "muy_reducido",
+        "c": 0.05,
+        "f1_train": 0.8751,
+        "f1_val": 0.8152,
+        "brecha": 0.0599
+      },
+      {
+        "vocabulario": "muy_reducido",
+        "c": 0.2,
+        "f1_train": 0.9368,
+        "f1_val": 0.805,
+        "brecha": 0.1317
+      }
+    ]
+  },
+  "sentimiento": {
+    "mejor": {
+      "vocabulario": "muy_reducido",
+      "c": 0.2,
+      "f1_train": 0.8863,
+      "f1_val": 0.8019,
+      "brecha": 0.0844,
+      "parametros": {
+        "max_palabras": 2000,
+        "min_df_palabras": 5,
+        "max_caracteres": 4000,
+        "min_df_caracteres": 10
+      }
+    },
+    "todas": [
+      {
+        "vocabulario": "actual",
+        "c": 0.005,
+        "f1_train": 0.7717,
+        "f1_val": 0.7683,
+        "brecha": 0.0034
+      },
+      {
+        "vocabulario": "actual",
+        "c": 0.01,
+        "f1_train": 0.786,
+        "f1_val": 0.7774,
+        "brecha": 0.0087
+      },
+      {
+        "vocabulario": "actual",
+        "c": 0.02,
+        "f1_train": 0.8067,
+        "f1_val": 0.7834,
+        "brecha": 0.0233
+      },
+      {
+        "vocabulario": "actual",
+        "c": 0.05,
+        "f1_train": 0.8436,
+        "f1_val": 0.7934,
+        "brecha": 0.0502
+      },
+      {
+        "vocabulario": "actual",
+        "c": 0.2,
+        "f1_train": 0.9268,
+        "f1_val": 0.7939,
+        "brecha": 0.1329
+      },
+      {
+        "vocabulario": "reducido",
+        "c": 0.005,
+        "f1_train": 0.7725,
+        "f1_val": 0.7674,
+        "brecha": 0.005
+      },
+      {
+        "vocabulario": "reducido",
+        "c": 0.01,
+        "f1_train": 0.7883,
+        "f1_val": 0.7794,
+        "brecha": 0.0089
+      },
+      {
+        "vocabulario": "reducido",
+        "c": 0.02,
+        "f1_train": 0.8078,
+        "f1_val": 0.7845,
+        "brecha": 0.0233
+      },
+      {
+        "vocabulario": "reducido",
+        "c": 0.05,
+        "f1_train": 0.8393,
+        "f1_val": 0.7944,
+        "brecha": 0.0449
+      },
+      {
+        "vocabulario": "reducido",
+        "c": 0.2,
+        "f1_train": 0.9056,
+        "f1_val": 0.7954,
+        "brecha": 0.1102
+      },
+      {
+        "vocabulario": "muy_reducido",
+        "c": 0.005,
+        "f1_train": 0.774,
+        "f1_val": 0.768,
+        "brecha": 0.0059
+      },
+      {
+        "vocabulario": "muy_reducido",
+        "c": 0.01,
+        "f1_train": 0.7892,
+        "f1_val": 0.7799,
+        "brecha": 0.0093
+      },
+      {
+        "vocabulario": "muy_reducido",
+        "c": 0.02,
+        "f1_train": 0.8067,
+        "f1_val": 0.783,
+        "brecha": 0.0237
+      },
+      {
+        "vocabulario": "muy_reducido",
+        "c": 0.05,
+        "f1_train": 0.8331,
+        "f1_val": 0.7903,
+        "brecha": 0.0428
+      },
+      {
+        "vocabulario": "muy_reducido",
+        "c": 0.2,
+        "f1_train": 0.8863,
+        "f1_val": 0.8019,
+        "brecha": 0.0844
+      }
+    ]
+  },
+  "tema_tarjetas": {
+    "mejor": {
+      "vocabulario": "muy_reducido",
+      "c": 0.2,
+      "f1_train": 0.9666,
+      "f1_val": 0.7185,
+      "brecha": 0.2481,
+      "parametros": {
+        "max_palabras": 2000,
+        "min_df_palabras": 5,
+        "max_caracteres": 4000,
+        "min_df_caracteres": 10
+      }
+    },
+    "todas": [
+      {
+        "vocabulario": "actual",
+        "c": 0.005,
+        "f1_train": 0.7344,
+        "f1_val": 0.6521,
+        "brecha": 0.0822
+      },
+      {
+        "vocabulario": "actual",
+        "c": 0.01,
+        "f1_train": 0.7697,
+        "f1_val": 0.6644,
+        "brecha": 0.1053
+      },
+      {
+        "vocabulario": "actual",
+        "c": 0.02,
+        "f1_train": 0.8189,
+        "f1_val": 0.6758,
+        "brecha": 0.143
+      },
+      {
+        "vocabulario": "actual",
+        "c": 0.05,
+        "f1_train": 0.8957,
+        "f1_val": 0.6913,
+        "brecha": 0.2045
+      },
+      {
+        "vocabulario": "actual",
+        "c": 0.2,
+        "f1_train": 0.9814,
+        "f1_val": 0.7018,
+        "brecha": 0.2796
+      },
+      {
+        "vocabulario": "reducido",
+        "c": 0.005,
+        "f1_train": 0.7384,
+        "f1_val": 0.6565,
+        "brecha": 0.0819
+      },
+      {
+        "vocabulario": "reducido",
+        "c": 0.01,
+        "f1_train": 0.7706,
+        "f1_val": 0.6648,
+        "brecha": 0.1058
+      },
+      {
+        "vocabulario": "reducido",
+        "c": 0.02,
+        "f1_train": 0.8191,
+        "f1_val": 0.6758,
+        "brecha": 0.1433
+      },
+      {
+        "vocabulario": "reducido",
+        "c": 0.05,
+        "f1_train": 0.8911,
+        "f1_val": 0.6871,
+        "brecha": 0.204
+      },
+      {
+        "vocabulario": "reducido",
+        "c": 0.2,
+        "f1_train": 0.9773,
+        "f1_val": 0.6984,
+        "brecha": 0.2789
+      },
+      {
+        "vocabulario": "muy_reducido",
+        "c": 0.005,
+        "f1_train": 0.7396,
+        "f1_val": 0.6587,
+        "brecha": 0.0809
+      },
+      {
+        "vocabulario": "muy_reducido",
+        "c": 0.01,
+        "f1_train": 0.7749,
+        "f1_val": 0.6593,
+        "brecha": 0.1156
+      },
+      {
+        "vocabulario": "muy_reducido",
+        "c": 0.02,
+        "f1_train": 0.8165,
+        "f1_val": 0.6794,
+        "brecha": 0.1371
+      },
+      {
+        "vocabulario": "muy_reducido",
+        "c": 0.05,
+        "f1_train": 0.8835,
+        "f1_val": 0.6833,
+        "brecha": 0.2002
+      },
+      {
+        "vocabulario": "muy_reducido",
+        "c": 0.2,
+        "f1_train": 0.9666,
+        "f1_val": 0.7185,
+        "brecha": 0.2481
+      }
+    ]
+  },
+  "tema_cartera": {
+    "todas": [
+      {
+        "vocabulario": "actual",
+        "c": 0.005,
+        "f1_train": 0.6814,
+        "f1_val": 0.699,
+        "brecha": -0.0177
+      },
+      {
+        "vocabulario": "actual",
+        "c": 0.01,
+        "f1_train": 0.7134,
+        "f1_val": 0.6925,
+        "brecha": 0.0209
+      },
+      {
+        "vocabulario": "actual",
+        "c": 0.02,
+        "f1_train": 0.7591,
+        "f1_val": 0.6707,
+        "brecha": 0.0883
+      },
+      {
+        "vocabulario": "actual",
+        "c": 0.05,
+        "f1_train": 0.8251,
+        "f1_val": 0.6857,
+        "brecha": 0.1394
+      },
+      {
+        "vocabulario": "actual",
+        "c": 0.2,
+        "f1_train": 0.9557,
+        "f1_val": 0.6961,
+        "brecha": 0.2596
+      },
+      {
+        "vocabulario": "reducido",
+        "c": 0.005,
+        "f1_train": 0.6833,
+        "f1_val": 0.699,
+        "brecha": -0.0157
+      },
+      {
+        "vocabulario": "reducido",
+        "c": 0.01,
+        "f1_train": 0.7149,
+        "f1_val": 0.6925,
+        "brecha": 0.0224
+      },
+      {
+        "vocabulario": "reducido",
+        "c": 0.02,
+        "f1_train": 0.7576,
+        "f1_val": 0.6707,
+        "brecha": 0.0868
+      },
+      {
+        "vocabulario": "reducido",
+        "c": 0.05,
+        "f1_train": 0.8207,
+        "f1_val": 0.6848,
+        "brecha": 0.1359
+      },
+      {
+        "vocabulario": "reducido",
+        "c": 0.2,
+        "f1_train": 0.9483,
+        "f1_val": 0.6771,
+        "brecha": 0.2712
+      },
+      {
+        "vocabulario": "muy_reducido",
+        "c": 0.005,
+        "f1_train": 0.6822,
+        "f1_val": 0.7067,
+        "brecha": -0.0246
+      },
+      {
+        "vocabulario": "muy_reducido",
+        "c": 0.01,
+        "f1_train": 0.7129,
+        "f1_val": 0.6842,
+        "brecha": 0.0288
+      },
+      {
+        "vocabulario": "muy_reducido",
+        "c": 0.02,
+        "f1_train": 0.7559,
+        "f1_val": 0.6707,
+        "brecha": 0.0852
+      },
+      {
+        "vocabulario": "muy_reducido",
+        "c": 0.05,
+        "f1_train": 0.8105,
+        "f1_val": 0.6914,
+        "brecha": 0.1191
+      },
+      {
+        "vocabulario": "muy_reducido",
+        "c": 0.2,
+        "f1_train": 0.9393,
+        "f1_val": 0.667,
+        "brecha": 0.2723
+      }
+    ],
+    "descartada": "En test bajó de 0.623 a 0.610: se conserva el modelo con el vocabulario por defecto.",
+    "mejor_aplicada": {
+      "vocabulario": "muy_reducido",
+      "c": 0.005,
+      "f1_train": 0.6822,
+      "f1_val": 0.7067,
+      "brecha": -0.0246,
+      "parametros": {
+        "max_palabras": 2000,
+        "min_df_palabras": 5,
+        "max_caracteres": 4000,
+        "min_df_caracteres": 10
+      }
+    }
+  }
+}
