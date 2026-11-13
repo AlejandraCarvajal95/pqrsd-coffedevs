@@ -5,13 +5,16 @@ rutas viven bajo un APIRouter con prefix="/api".
 """
 
 import logging
+import threading
 from contextlib import asynccontextmanager
 
 from fastapi import APIRouter, FastAPI
 from fastapi.concurrency import run_in_threadpool
 
 from app.api import chat, costos, estado, pqrsd
+from app.config import configuracion
 from app.db import base_disponible, inicializar_base_de_datos
+from app.pipeline import svm
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
 
@@ -20,6 +23,9 @@ logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(messag
 async def ciclo_de_vida(_: FastAPI):
     # Reintenta la conexión, habilita pgvector y crea las tablas que falten.
     await run_in_threadpool(inicializar_base_de_datos)
+    # Precarga en segundo plano: el backend responde de inmediato y /api/health no espera.
+    if configuracion.precargar_modelos:
+        threading.Thread(target=svm.precargar, name="precarga-modelos", daemon=True).start()
     yield
 
 

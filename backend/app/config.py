@@ -36,6 +36,9 @@ class Configuracion(BaseSettings):
     # el conocimiento con --forzar.
     embedding_modelo: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
     embedding_cache_dir: str | None = None  # dónde se guarda el modelo descargado
+    # Carga los modelos SVM y el de embeddings al arrancar (en segundo plano), para que la
+    # primera PQRSD no espere ~1 minuto. Las pruebas lo apagan.
+    precargar_modelos: bool = True
 
     # --- RAG ---
     rag_top_k: int = Field(default=4, gt=0, le=20)

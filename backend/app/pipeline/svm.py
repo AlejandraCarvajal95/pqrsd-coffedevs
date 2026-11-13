@@ -17,6 +17,7 @@ El SVM va dentro de CalibratedClassifierCV: la confianza es una probabilidad cal
 
 import logging
 import threading
+import time
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -115,6 +116,19 @@ _candado = threading.Lock()
 
 def modelos_disponibles() -> list[str]:
     return sorted(p.stem for p in DIR_MODELOS.glob("*.joblib"))
+
+
+def precargar() -> None:
+    """Carga en memoria todos los modelos SVM y el de embeddings (se llama al arrancar)."""
+    inicio = time.monotonic()
+    try:
+        for capa in modelos_disponibles():
+            _modelo(capa)
+        embeddings.generar_embeddings(["precarga del modelo de embeddings"])
+        logger.info("Modelos precargados en %.0f s: %s", time.monotonic() - inicio,
+                    ", ".join(modelos_disponibles()))
+    except Exception:  # noqa: BLE001 - si falla, se cargan al usarlos por primera vez
+        logger.exception("No se pudieron precargar los modelos")
 
 
 def _modelo(capa: str) -> Pipeline | None:
