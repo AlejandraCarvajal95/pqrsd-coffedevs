@@ -13,6 +13,7 @@ import uuid
 
 from app.db import SesionLocal
 from app.models import PQRSD
+from app.pipeline import clasificador
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +30,8 @@ def procesar_pqrsd(pqrsd_id: uuid.UUID) -> None:
                 logger.warning("Pipeline: no existe la PQRSD %s", pqrsd_id)
                 return
             logger.info("Pipeline iniciado para %s", pqrsd.radicado)
+            # Paso 1: clasificación (US-011). Si falla, queda en revisión humana.
+            clasificador.clasificar_pqrsd(sesion, pqrsd)
             sesion.commit()
     except Exception:  # noqa: BLE001 - un fallo del pipeline no debe tumbar el backend
         logger.exception("Pipeline falló para la PQRSD %s", pqrsd_id)

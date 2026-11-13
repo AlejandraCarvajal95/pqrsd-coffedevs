@@ -48,6 +48,12 @@ El gasto estimado en la API de Claude, total y por tarea, se consulta en http://
 
 Abre http://localhost/radicar, o usa "Continuar con una PQRSD" desde el chat. El endpoint es `POST /api/pqrsd` con `nombre_ciudadano`, `contacto` (correo o teléfono, ficticios), `asunto`, `descripcion` (máximo 4000 caracteres) y `canal` (`formulario` o `chat`). Responde 201 con el radicado y deja la PQRSD en estado `recibida`. Luego dispara el pipeline de IA en segundo plano (`pipeline/orquestador.py`). Si falta un campo, responde 422 con los nombres en `campos` y no guarda nada.
 
+El primer paso del pipeline es el clasificador (US-011, `pipeline/clasificador.py`). El modelo liviano, con el prompt y los ejemplos de `prompts/clasificador.md`, asigna `tipo`, `area` (Tarjetas de Crédito, Cartera, Seguros de Vida o Jurídica) y `confianza` (0 a 1), y deja la PQRSD en `clasificada`. Si la salida no es válida reintenta una vez. Si vuelve a fallar, o la API o el presupuesto fallan, la deja en `pendiente_revision_clasificacion` para que la clasifique una persona. Para ver el resultado:
+
+```bash
+docker compose exec db psql -U pqrsd -d pqrsd -c "select radicado, estado, tipo, area, confianza from pqrsd"
+```
+
 ```bash
 curl -s -X POST localhost/api/pqrsd -H 'Content-Type: application/json' \
   -d '{"nombre_ciudadano":"Ciudadana Ficticia","contacto":"ficticia@ejemplo.test","asunto":"Cobro doble","descripcion":"Me cobraron la cuota de manejo dos veces."}'
