@@ -1,0 +1,636 @@
+/* Detalle de una PQRSD como espacio de trabajo con asistente de IA (US-020,
+   US-021 y US-023): chat a la izquierda, documento a la derecha y los
+   detalles del caso en un panel lateral. Usa los tokens de identidad.css y
+   las clases base del panel (admin.css). */
+
+.visualmente-oculto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* --- Espacio de trabajo --- */
+
+/* Ocupa el alto visible bajo la cabecera fija (60 px + borde). */
+.espacio {
+  --alto-cabecera: 61px;
+  display: flex;
+  flex-direction: column;
+  height: calc(100dvh - var(--alto-cabecera));
+  min-height: 560px;
+  max-width: 1600px;
+  margin-inline: auto;
+  padding: var(--espacio-12) clamp(16px, 2vw, 32px) var(--espacio-16);
+}
+
+.espacio__barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--espacio-8) var(--espacio-16);
+  padding-bottom: var(--espacio-12);
+}
+
+.espacio__volver {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  flex: none;
+  border-radius: var(--radio-botones);
+  color: var(--color-tinta);
+  font-size: 18px;
+  text-decoration: none;
+  transition: background-color var(--duracion-corta);
+}
+
+.espacio__volver:hover {
+  background: var(--color-nube);
+}
+
+.espacio__titulo {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.espacio__titulo .etiqueta-tecnica {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--color-pizarra);
+}
+
+.espacio__titulo h1 {
+  margin: 0;
+  overflow: hidden;
+  font-family: var(--fuente-display);
+  font-size: 22px;
+  font-weight: var(--peso-medio);
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.espacio__estado {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--espacio-8);
+}
+
+.espacio__detalles {
+  min-height: 38px;
+  padding-block: var(--espacio-4);
+}
+
+.espacio__avisos {
+  display: grid;
+  gap: var(--espacio-8);
+  padding-bottom: var(--espacio-12);
+}
+
+.espacio__avisos > * {
+  margin: 0;
+}
+
+/* Selector Chat / Documento: solo en pantallas angostas. */
+.espacio__vistas {
+  display: none;
+  gap: var(--espacio-4);
+  margin-bottom: var(--espacio-12);
+  padding: var(--espacio-4);
+  background: var(--color-nube);
+  border-radius: var(--radio-botones);
+}
+
+.espacio__vistas button {
+  flex: 1;
+  min-height: 40px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--color-carbon);
+  font: inherit;
+  font-size: var(--texto-cuerpo);
+  font-weight: var(--peso-medio);
+  cursor: pointer;
+}
+
+.espacio__vistas button[aria-pressed='true'] {
+  background: #fff;
+  color: var(--color-tinta);
+  box-shadow: 0 0 0 1px var(--color-acero);
+}
+
+.espacio__paneles {
+  display: grid;
+  grid-template-columns: minmax(340px, 2fr) minmax(0, 3fr);
+  gap: var(--espacio-16);
+  flex: 1;
+  min-height: 0;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: var(--radio-tarjetas);
+}
+
+.panel--chat {
+  background: var(--color-nube);
+}
+
+.panel--documento {
+  background: #fff;
+  box-shadow:
+    0 0 0 1px var(--color-acero),
+    var(--elevacion-tarjeta-tecnica);
+}
+
+/* --- Chat --- */
+
+.chat__mensajes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-16);
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+  padding: var(--espacio-16);
+  overflow-y: auto;
+  list-style: none;
+}
+
+.chat__intro {
+  display: grid;
+  gap: var(--espacio-16);
+}
+
+.chat__caso {
+  padding: var(--espacio-12) var(--espacio-16);
+  background: #fff;
+  border-radius: var(--radio-botones);
+  box-shadow: 0 0 0 1px var(--color-acero);
+}
+
+.chat__caso-texto {
+  margin: var(--espacio-4) 0 0;
+  font-size: var(--texto-lectura);
+  line-height: var(--interlineado-lectura);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.chat__turno {
+  max-width: 100%;
+}
+
+.chat__turno[data-rol='empleado'] {
+  align-self: flex-end;
+  max-width: 85%;
+  padding: var(--espacio-10) var(--espacio-16);
+  background: var(--color-grafito);
+  border-radius: 16px 16px 4px 16px;
+  color: #fff;
+}
+
+.chat__autor {
+  display: block;
+  margin: 0;
+  font-family: var(--fuente-mono);
+  font-size: 11px;
+  color: var(--color-pizarra);
+}
+
+.chat__texto {
+  margin: 2px 0 0;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.chat__texto + .chat__texto {
+  margin-top: var(--espacio-8);
+}
+
+.chat__enlace {
+  min-height: 32px;
+  margin-top: var(--espacio-4);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-tinta);
+  font: inherit;
+  font-size: 13px;
+  font-weight: var(--peso-medio);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.chat__enlace:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.chat__solo-angosto {
+  display: none;
+}
+
+.chat__cambio {
+  margin-top: var(--espacio-8);
+  padding: var(--espacio-8) var(--espacio-12);
+  background: var(--semaforo-verde-fondo);
+  border-radius: var(--radio-botones);
+  font-size: 13px;
+}
+
+.chat__cambio[data-deshecho='true'] {
+  background: #fff;
+  box-shadow: 0 0 0 1px var(--color-acero);
+}
+
+.chat__cambio-titulo {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-4);
+  margin: 0;
+  font-weight: var(--peso-medio);
+  color: var(--color-tinta);
+}
+
+.chat__cambio[data-deshecho='false'] .chat__cambio-titulo svg {
+  color: var(--semaforo-verde);
+}
+
+.chat__fuentes {
+  margin: var(--espacio-4) 0 0;
+  font-size: 12px;
+  color: var(--color-carbon);
+}
+
+.chat__cambio-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espacio-16);
+}
+
+.chat__cambio-acciones:empty {
+  display: none;
+}
+
+/* Compositor al estilo de los chats de IA: caja redondeada con el botón dentro. */
+.chat__compositor {
+  padding: var(--espacio-8) var(--espacio-16) var(--espacio-12);
+}
+
+.chat__compositor .aviso-error {
+  margin: 0 0 var(--espacio-8);
+}
+
+.chat__sugerencias {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espacio-8);
+  margin-bottom: var(--espacio-8);
+}
+
+.chat__chip {
+  min-height: 32px;
+  padding: var(--espacio-4) var(--espacio-12);
+  background: #fff;
+  border: 1px solid var(--color-acero);
+  border-radius: var(--radio-pildoras);
+  color: var(--color-tinta);
+  font: inherit;
+  font-size: 13px;
+  font-weight: var(--peso-medio);
+  cursor: pointer;
+  transition:
+    background-color var(--duracion-corta),
+    border-color var(--duracion-corta);
+}
+
+.chat__chip:hover:not(:disabled) {
+  background: var(--color-menta-senal);
+  border-color: var(--color-tinta);
+}
+
+.chat__chip:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.chat__caja {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--espacio-8);
+  padding: var(--espacio-8) var(--espacio-8) var(--espacio-8) var(--espacio-16);
+  background: #fff;
+  border-radius: 16px;
+  box-shadow:
+    0 0 0 1px var(--color-acero),
+    0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: box-shadow var(--duracion-corta);
+}
+
+.chat__caja:focus-within {
+  box-shadow: 0 0 0 2px var(--color-tinta);
+}
+
+.chat__caja[data-bloqueada='true'] {
+  background: var(--color-papel);
+}
+
+.chat__entrada {
+  flex: 1;
+  min-width: 0;
+  max-height: 200px;
+  padding: 7px 0;
+  border: 0;
+  outline: none; /* el foco lo marca el anillo de .chat__caja */
+  background: transparent;
+  color: var(--color-tinta);
+  font: inherit;
+  font-size: 15px;
+  line-height: 1.5;
+  resize: none;
+}
+
+.chat__entrada::placeholder {
+  color: var(--color-pizarra);
+}
+
+.chat__enviar {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  flex: none;
+  border: 0;
+  border-radius: 10px;
+  background: var(--color-grafito);
+  color: #fff;
+  cursor: pointer;
+  transition: opacity var(--duracion-corta);
+}
+
+.chat__enviar:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+.chat__pie {
+  margin: var(--espacio-8) var(--espacio-4) 0;
+  font-size: 12px;
+  color: var(--color-carbon);
+}
+
+/* --- Documento --- */
+
+.documento__barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--espacio-8) var(--espacio-12);
+  padding: var(--espacio-12) var(--espacio-16);
+  border-bottom: 1px solid var(--color-nube);
+}
+
+.documento__titulo {
+  margin: 0;
+  font-family: var(--fuente-display);
+  font-size: 18px;
+  font-weight: var(--peso-medio);
+  letter-spacing: -0.02em;
+}
+
+.documento__guardado {
+  font-family: var(--fuente-mono);
+  font-size: 12px;
+  color: var(--color-pizarra);
+}
+
+.documento__guardado[data-pendiente='true'] {
+  color: var(--semaforo-amarillo);
+}
+
+.documento__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espacio-8);
+  margin-left: auto;
+}
+
+.documento__acciones .boton {
+  min-height: 38px;
+  padding: var(--espacio-4) var(--espacio-12);
+}
+
+.documento__cuerpo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-12);
+  flex: 1;
+  min-height: 0;
+  padding: var(--espacio-16);
+  overflow-y: auto;
+}
+
+.documento__cuerpo > * {
+  margin: 0;
+}
+
+.documento__nota {
+  font-size: 13px;
+  color: var(--color-carbon);
+}
+
+/* La hoja: el texto de la respuesta con aspecto de documento. */
+.documento__hoja {
+  width: 100%;
+  padding: var(--espacio-24) clamp(16px, 3vw, 40px);
+  background: var(--color-papel);
+  border: 0;
+  border-radius: var(--radio-botones);
+  box-shadow: inset 0 0 0 1px var(--color-nube);
+  color: var(--color-tinta);
+  font-family: var(--fuente-interfaz);
+  font-size: var(--texto-lectura);
+  line-height: 1.65;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.documento__editor {
+  flex: 1 0 320px;
+  resize: none;
+  outline: none;
+  transition: box-shadow var(--duracion-corta);
+}
+
+.documento__editor:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--color-tinta);
+}
+
+/* Destello breve cuando el asistente cambia el documento. */
+.documento__editor[data-resaltar='true'] {
+  animation: destello-documento 1.4s ease-out;
+}
+
+@keyframes destello-documento {
+  from {
+    background: var(--semaforo-verde-fondo);
+    box-shadow: inset 0 0 0 2px var(--semaforo-verde);
+  }
+
+  to {
+    background: var(--color-papel);
+    box-shadow: inset 0 0 0 1px var(--color-nube);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .documento__editor[data-resaltar='true'] {
+    animation: none;
+  }
+}
+
+.documento__cuerpo .bloqueos {
+  margin: 0;
+}
+
+.documento__fuentes {
+  flex: none;
+  border-radius: var(--radio-botones);
+  box-shadow: 0 0 0 1px var(--color-acero);
+}
+
+.documento__fuentes > summary {
+  padding: var(--espacio-12) var(--espacio-16);
+  font-size: var(--texto-cuerpo);
+  font-weight: var(--peso-medio);
+  cursor: pointer;
+}
+
+.documento__fuentes > summary .texto-apoyo {
+  font-weight: var(--peso-regular);
+}
+
+.documento__fuentes > :not(summary) {
+  margin: 0 var(--espacio-16) var(--espacio-16);
+}
+
+/* --- Panel lateral de detalles --- */
+
+.cajon {
+  width: min(560px, 100vw);
+  max-width: 100vw;
+  height: 100dvh;
+  max-height: 100dvh;
+  margin: 0 0 0 auto;
+  padding: 0;
+  border: 0;
+  background: var(--color-papel);
+  color: var(--color-tinta);
+  box-shadow: var(--elevacion-tarjeta-nube);
+}
+
+.cajon::backdrop {
+  background: rgba(28, 25, 23, 0.45);
+}
+
+.cajon__cabecera {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espacio-12);
+  padding: var(--espacio-12) var(--espacio-20, 20px);
+  background: var(--color-papel);
+  border-bottom: 1px solid var(--color-acero);
+}
+
+.cajon__cabecera .caso__subtitulo {
+  margin: 0;
+}
+
+.cajon__contenido {
+  display: grid;
+  gap: var(--espacio-16);
+  padding: var(--espacio-16) var(--espacio-20, 20px) var(--espacio-32);
+}
+
+/* --- Aprendizajes del equipo (US-023) --- */
+
+.aprendizaje__bajada {
+  margin: 0 0 var(--espacio-12);
+  font-size: var(--texto-cuerpo);
+}
+
+.dialogo--ancho {
+  width: min(600px, calc(100vw - 32px));
+}
+
+.dialogo--ancho textarea.campo__control {
+  min-height: 140px;
+}
+
+/* --- Pantallas angostas: un panel a la vez --- */
+
+@media (max-width: 960px) {
+  .espacio {
+    height: auto;
+    min-height: 0;
+  }
+
+  .espacio__vistas {
+    display: flex;
+  }
+
+  .espacio__paneles {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .panel {
+    height: calc(100dvh - 200px);
+    min-height: 480px;
+  }
+
+  .espacio[data-vista='chat'] .panel--documento,
+  .espacio[data-vista='documento'] .panel--chat {
+    display: none;
+  }
+
+  .chat__solo-angosto {
+    display: inline;
+  }
+}
+
+@media (max-width: 719px) {
+  .espacio__titulo h1 {
+    white-space: normal;
+  }
+
+  .documento__acciones {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .documento__acciones .boton {
+    flex: 1 1 auto;
+  }
+
+  .chat__turno[data-rol='empleado'] {
+    max-width: 92%;
+  }
+}

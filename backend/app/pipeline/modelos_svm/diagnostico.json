@@ -1,0 +1,196 @@
+{
+  "sobreajuste": {
+    "area": {
+      "f1_entrenamiento": 0.963,
+      "f1_test": 0.7734,
+      "brecha": 0.189,
+      "f1_val_por_c": {
+        "0.05": 0.806,
+        "0.2": 0.8078,
+        "1.0": 0.7988
+      }
+    },
+    "fraude": {
+      "f1_entrenamiento": 0.937,
+      "f1_test": 0.8097,
+      "brecha": 0.128,
+      "f1_val_por_c": {
+        "0.05": 0.8141,
+        "0.2": 0.8274,
+        "1.0": 0.7964
+      }
+    },
+    "sentimiento": {
+      "f1_entrenamiento": 0.981,
+      "f1_test": 0.7927,
+      "brecha": 0.188,
+      "f1_val_por_c": {
+        "0.05": 0.7934,
+        "0.2": 0.7939,
+        "1.0": 0.7964
+      }
+    },
+    "tema_cartera": {
+      "f1_entrenamiento": 0.942,
+      "f1_test": 0.6225,
+      "brecha": 0.32,
+      "f1_val_por_c": {
+        "0.05": 0.6857,
+        "0.2": 0.6961,
+        "1.0": 0.6525
+      }
+    },
+    "tema_juridica": {
+      "f1_entrenamiento": 0.905,
+      "f1_test": 0.7495,
+      "brecha": 0.155,
+      "f1_val_por_c": {
+        "0.05": 0.9111,
+        "0.2": 0.9111,
+        "1.0": 0.8888
+      }
+    },
+    "tema_tarjetas": {
+      "f1_entrenamiento": 1.0,
+      "f1_test": 0.7506,
+      "brecha": 0.249,
+      "f1_val_por_c": {
+        "0.05": 0.6913,
+        "0.2": 0.7018,
+        "1.0": 0.7048
+      }
+    },
+    "tipo": {
+      "f1_entrenamiento": 0.955,
+      "f1_test": 0.6558,
+      "brecha": 0.299,
+      "f1_val_por_c": {
+        "0.05": 0.7317,
+        "0.2": 0.7369,
+        "1.0": 0.7365
+      }
+    }
+  },
+  "pesos_tipo": {
+    "sin_pesos | C=0.05": {
+      "f1_macro_val": 0.7327,
+      "por_clase": {
+        "denuncia": 0.846,
+        "peticion": 0.767,
+        "queja": 0.699,
+        "reclamo": 0.586,
+        "sugerencia": 0.765
+      }
+    },
+    "sin_pesos | C=0.2": {
+      "f1_macro_val": 0.7374,
+      "por_clase": {
+        "denuncia": 0.849,
+        "peticion": 0.768,
+        "queja": 0.688,
+        "reclamo": 0.596,
+        "sugerencia": 0.786
+      }
+    },
+    "sin_pesos | C=1.0": {
+      "f1_macro_val": 0.7365,
+      "por_clase": {
+        "denuncia": 0.87,
+        "peticion": 0.757,
+        "queja": 0.674,
+        "reclamo": 0.598,
+        "sugerencia": 0.784
+      }
+    },
+    "balanceado (actual) | C=0.05": {
+      "f1_macro_val": 0.7317,
+      "por_clase": {
+        "denuncia": 0.846,
+        "peticion": 0.767,
+        "queja": 0.688,
+        "reclamo": 0.581,
+        "sugerencia": 0.777
+      }
+    },
+    "balanceado (actual) | C=0.2": {
+      "f1_macro_val": 0.7369,
+      "por_clase": {
+        "denuncia": 0.855,
+        "peticion": 0.768,
+        "queja": 0.688,
+        "reclamo": 0.592,
+        "sugerencia": 0.782
+      }
+    },
+    "balanceado (actual) | C=1.0": {
+      "f1_macro_val": 0.7365,
+      "por_clase": {
+        "denuncia": 0.87,
+        "peticion": 0.757,
+        "queja": 0.674,
+        "reclamo": 0.598,
+        "sugerencia": 0.784
+      }
+    },
+    "castigo x1.5 queja/reclamo/peticion | C=0.05": {
+      "f1_macro_val": 0.7387,
+      "por_clase": {
+        "denuncia": 0.852,
+        "peticion": 0.778,
+        "queja": 0.697,
+        "reclamo": 0.59,
+        "sugerencia": 0.777
+      }
+    },
+    "castigo x1.5 queja/reclamo/peticion | C=0.2": {
+      "f1_macro_val": 0.7403,
+      "por_clase": {
+        "denuncia": 0.849,
+        "peticion": 0.776,
+        "queja": 0.683,
+        "reclamo": 0.604,
+        "sugerencia": 0.79
+      }
+    },
+    "castigo x1.5 queja/reclamo/peticion | C=1.0": {
+      "f1_macro_val": 0.7352,
+      "por_clase": {
+        "denuncia": 0.87,
+        "peticion": 0.752,
+        "queja": 0.671,
+        "reclamo": 0.598,
+        "sugerencia": 0.784
+      }
+    },
+    "castigo x2 queja/reclamo | C=0.05": {
+      "f1_macro_val": 0.7373,
+      "por_clase": {
+        "denuncia": 0.852,
+        "peticion": 0.774,
+        "queja": 0.697,
+        "reclamo": 0.593,
+        "sugerencia": 0.771
+      }
+    },
+    "castigo x2 queja/reclamo | C=0.2": {
+      "f1_macro_val": 0.735,
+      "por_clase": {
+        "denuncia": 0.849,
+        "peticion": 0.766,
+        "queja": 0.678,
+        "reclamo": 0.592,
+        "sugerencia": 0.79
+      }
+    },
+    "castigo x2 queja/reclamo | C=1.0": {
+      "f1_macro_val": 0.739,
+      "por_clase": {
+        "denuncia": 0.87,
+        "peticion": 0.762,
+        "queja": 0.678,
+        "reclamo": 0.6,
+        "sugerencia": 0.784
+      }
+    }
+  }
+}

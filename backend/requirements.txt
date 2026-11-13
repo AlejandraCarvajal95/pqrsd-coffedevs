@@ -1,0 +1,10 @@
+fastapi==0.162.5
+uvicorn[standard]==0.54.0
+sqlalchemy==2.1.8
+psycopg[binary]==3.3.8
+pgvector==0.5.1
+pydantic-settings==2.16.2
+anthropic==2.8.0
+fastembed==0.9.1  # embeddings locales (ONNX), sin costo de API
+scikit-learn==1.6.1  # SVM del embudo de clasificación (incluye joblib)
+fpdf2==2.8.7  # carta de respuesta en PDF (pdf_respuesta.py)
