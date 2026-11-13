@@ -6,6 +6,7 @@ import './styles/identidad.css'
 import './styles/base.css'
 import './styles/paginas.css'
 import './styles/admin.css'
+import './styles/asistente.css'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
