@@ -30,6 +30,7 @@ Guía para personas y asistentes de IA que trabajen en este repositorio.
 - Los prompts viven en archivos `.md` dentro de `backend/app/pipeline/prompts/`, no como cadenas en el código.
 - **No inventar normas ni datos.** Las respuestas citan fragmentos recuperados por el RAG; si no hay soporte, se dice.
 - Los pasos del pipeline se encadenan en `pipeline/orquestador.py`, que corre en segundo plano al radicar. Si un paso de IA falla, la PQRSD queda para revisión humana; nunca se inventa un resultado.
+- Borrador (`pipeline/generador.py`, prompt `prompts/borrador_pqrsd.md`): solo para PQRSD `clasificada`. Cita con `[F#]` los fragmentos del RAG; las etiquetas sin fragmento se borran. Sin contexto, o sin citas, el borrador lleva un `[AVISO AUTOMÁTICO DEL SISTEMA]` para el analista. Si la API o el presupuesto fallan no se crea borrador y la PQRSD sigue `clasificada`. Al modelo no se le envía el contacto del ciudadano.
 - Chat de desvío (`pipeline/desvio.py`): responde solo con fragmentos citados (`[F#]`); sin contexto suficiente no llama a Claude y devuelve un mensaje fijo.
 - Presupuesto total de IA del evento: 40 USD. Registrar tokens de entrada y salida en `borradores`.
 
