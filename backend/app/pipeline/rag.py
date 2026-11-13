@@ -32,6 +32,9 @@ from app.pipeline import embeddings
 
 logger = logging.getLogger(__name__)
 
+# Los aprendizajes del equipo (pipeline/retroalimentacion.py) se guardan como "retro_…".
+PREFIJO_APRENDIZAJE = "retro_"
+
 SIN_CONTEXTO = "sin contexto suficiente"
 CON_CONTEXTO = "ok"
 
@@ -112,13 +115,24 @@ def embedding_de_consulta(sesion: Session, texto: str) -> list[float]:
     return vector
 
 
+def _es_aprendizaje(documento: str) -> bool:
+    return documento.startswith(PREFIJO_APRENDIZAJE)
+
+
 def recuperar(
     sesion: Session,
     texto: str,
     k: int | None = None,
     umbral: float | None = None,
+    con_aprendizajes: bool = False,
 ) -> ResultadoRAG:
-    """Busca los k fragmentos más parecidos al texto y descarta los que no superan el umbral."""
+    """Busca los k fragmentos más parecidos al texto y descarta los que no superan el umbral.
+
+    con_aprendizajes=True (borradores y chat del empleado) reserva un lugar más
+    para el aprendizaje del equipo más parecido (US-023), si supera el umbral:
+    así un criterio recién guardado no queda fuera porque los documentos base
+    ocupen los k primeros puestos. El chat del ciudadano no lo usa.
+    """
     k = k or configuracion.rag_top_k
     umbral = configuracion.rag_umbral_similitud if umbral is None else umbral
     if not texto or not texto.strip():
@@ -126,11 +140,14 @@ def recuperar(
 
     vector = embedding_de_consulta(sesion, texto)
     distancia = FragmentoConocimiento.embedding.cosine_distance(vector)
-    filas = sesion.execute(
-        select(FragmentoConocimiento, (1 - distancia).label("similitud"))
-        .order_by(distancia)
-        .limit(k)
-    ).all()
+    consulta = select(FragmentoConocimiento, (1 - distancia).label("similitud")).order_by(distancia)
+    filas = list(sesion.execute(consulta.limit(k)).all())
+    if con_aprendizajes and not any(_es_aprendizaje(fila.documento) for fila, _ in filas):
+        filas += sesion.execute(
+            consulta.where(
+                FragmentoConocimiento.documento.startswith(PREFIJO_APRENDIZAJE, autoescape=True)
+            ).limit(1)
+        ).all()
 
     fragmentos = tuple(
         FragmentoRecuperado(

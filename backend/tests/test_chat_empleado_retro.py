@@ -448,3 +448,37 @@ def test_la_recarga_completa_incluye_los_aprendizajes(sesion, embedder_falso, tm
     assert resumen.documentos == ["politica", "retro_20261113_x"]
     documentos = set(sesion.scalars(select(FragmentoConocimiento.documento)))
     assert {"politica", "retro_20261113_x"} <= documentos  # el aprendizaje no es huérfano
+
+
+def test_el_rag_reserva_un_lugar_para_el_aprendizaje_del_equipo(panel):
+    pqrsd, _ = _con_borrador(panel.sesion)
+    documento = _retro(panel, pqrsd).json()["documento"]
+    consulta = "Me cobraron la cuota de manejo de la tarjeta dos veces en el mismo mes"
+
+    # Con k=1 el documento base ocupa el único puesto y el aprendizaje queda fuera…
+    normal = rag.recuperar(panel.sesion, consulta, k=1, umbral=0.1)
+    assert [f.documento for f in normal.fragmentos] == ["banco_prueba"]
+    # …salvo que se pida el lugar reservado (borradores y chat del empleado).
+    ampliado = rag.recuperar(panel.sesion, consulta, k=1, umbral=0.1, con_aprendizajes=True)
+    assert [f.documento for f in ampliado.fragmentos] == ["banco_prueba", documento]
+    # Si el aprendizaje no supera el umbral, no se agrega.
+    lejano = rag.recuperar(panel.sesion, consulta, k=1, umbral=0.99, con_aprendizajes=True)
+    assert lejano.fragmentos == ()
+
+
+def test_el_siguiente_borrador_recibe_el_aprendizaje(panel, monkeypatch):
+    from app.pipeline import generador
+
+    monkeypatch.setattr(configuracion, "rag_top_k", 1)
+    origen, _ = _con_borrador(panel.sesion)
+    documento = _retro(panel, origen).json()["documento"]
+    cliente = panel.usar("La cuota se cobra una vez al mes [F1]; se confirma el duplicado [F2].")
+    nueva = _pqrsd(panel.sesion)
+
+    borrador = generador.generar_borrador(panel.sesion, nueva)
+
+    mensaje = cliente.llamadas[0]["messages"][0]["content"]
+    assert f"[F2] Fuente: {documento}" in mensaje
+    assert "primero se confirma el cobro duplicado" in mensaje
+    assert [c["documento"] for c in borrador.citas] == ["banco_prueba", documento]
+
