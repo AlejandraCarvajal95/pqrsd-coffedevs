@@ -66,7 +66,7 @@ function Resumen({ metricas, onAtajo }) {
     },
   ]
   return (
-    <ul className="resumen">
+    <ul className="resumen sobre-oscuro">
       {cifras.map((dato) => (
         <li key={dato.clave} className="resumen__celda">
           <button
@@ -455,7 +455,7 @@ export default function AdminPanel() {
   const hayFiltros = Object.values(filtros).some(Boolean)
 
   return (
-    <div className="contenedor pagina admin">
+    <div className="contenedor pagina admin admin--amplio">
       <header className="admin__cabecera">
         <div>
           <p className="etiqueta-tecnica texto-apoyo">Panel de atención</p>
@@ -476,12 +476,17 @@ export default function AdminPanel() {
         </p>
       )}
 
-      {metricas ? (
-        <Resumen metricas={metricas} onAtajo={irDesdeResumen} />
-      ) : (
-        !error && <p className="vacio texto-apoyo" role="status">Cargando el resumen…</p>
-      )}
+      {/* En pantallas anchas el resumen va en una columna a la izquierda y la bandeja a la derecha. */}
+      <div className="admin__cuerpo">
+      <aside className="admin__lateral" aria-label="Resumen">
+        {metricas ? (
+          <Resumen metricas={metricas} onAtajo={irDesdeResumen} />
+        ) : (
+          !error && <p className="vacio texto-apoyo" role="status">Cargando el resumen…</p>
+        )}
+      </aside>
 
+      <div className="admin__principal">
       <div className="pestanas" role="tablist" aria-label="Vistas del panel">
         {VISTAS.map((opcion) => (
           <button
@@ -547,6 +552,8 @@ export default function AdminPanel() {
           </>
         )}
       </section>
+      </div>
+      </div>
     </div>
   )
 }
