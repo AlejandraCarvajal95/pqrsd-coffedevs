@@ -911,6 +911,30 @@
   margin: 2px 0 0;
 }
 
+.estado__respuesta {
+  margin-top: var(--espacio-24);
+  padding: var(--espacio-16);
+  background: var(--color-nube);
+  border-radius: var(--radio-botones);
+}
+
+.estado__respuesta p {
+  margin: 0;
+}
+
+.estado__respuesta-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espacio-8);
+  margin-top: var(--espacio-12);
+}
+
+@media (max-width: 479px) {
+  .estado__respuesta-acciones .boton {
+    flex: 1 1 100%;
+  }
+}
+
 @keyframes crecer-riel {
   from {
     transform: scale(0);

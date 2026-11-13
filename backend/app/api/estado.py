@@ -5,6 +5,10 @@ simplificado y fechas. Nunca expone borradores, clasificación, área ni datos
 personales. Un radicado inexistente o mal escrito da siempre la misma
 respuesta (404 genérico), y hay un límite de consultas por IP para que no se
 puedan adivinar radicados probando uno tras otro.
+
+GET /api/pqrsd/{radicado}/respuesta.pdf entrega la carta aprobada en PDF, con
+el logo y el nombre del banco, solo cuando la PQRSD ya está respondida. Usa el
+mismo límite y el mismo 404 genérico que la consulta de estado.
 """
 
 import threading
@@ -13,13 +17,14 @@ from collections import defaultdict, deque
 from datetime import date, datetime
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.db import obtener_sesion
 from app.models import PQRSD, EstadoPQRSD
+from app.pdf_respuesta import respuesta_aprobada, respuesta_pdf
 
 router = APIRouter(prefix="/pqrsd", tags=["estado"])
 
@@ -90,8 +95,7 @@ def _ip_del_cliente(peticion: Request) -> str:
     )
 
 
-@router.get("/{radicado}", response_model=SalidaEstado)
-def consultar_estado(radicado: str, peticion: Request, sesion_db: SesionDB) -> SalidaEstado:
+def _buscar_con_limite(radicado: str, peticion: Request, sesion_db: Session) -> PQRSD:
     if not limitador.permitir(_ip_del_cliente(peticion)):
         raise HTTPException(status_code=429, detail=MENSAJE_LIMITE)
 
@@ -101,6 +105,12 @@ def consultar_estado(radicado: str, peticion: Request, sesion_db: SesionDB) -> S
     ).first()
     if pqrsd is None:
         raise HTTPException(status_code=404, detail=MENSAJE_NO_ENCONTRADO)
+    return pqrsd
+
+
+@router.get("/{radicado}", response_model=SalidaEstado)
+def consultar_estado(radicado: str, peticion: Request, sesion_db: SesionDB) -> SalidaEstado:
+    pqrsd = _buscar_con_limite(radicado, peticion, sesion_db)
 
     estado, etiqueta = ETAPAS_PUBLICAS[pqrsd.estado]
     return SalidaEstado(
@@ -110,3 +120,19 @@ def consultar_estado(radicado: str, peticion: Request, sesion_db: SesionDB) -> S
         fecha_radicacion=pqrsd.fecha_radicacion,
         fecha_vencimiento=pqrsd.fecha_vencimiento,
     )
+
+
+@router.get("/{radicado}/respuesta.pdf")
+def descargar_respuesta(
+    radicado: str, peticion: Request, sesion_db: SesionDB, descargar: bool = False
+) -> Response:
+    """Carta de respuesta en PDF. Sin respuesta aprobada, el mismo 404 genérico."""
+    pqrsd = _buscar_con_limite(radicado, peticion, sesion_db)
+    aprobada = (
+        respuesta_aprobada(sesion_db, pqrsd)
+        if pqrsd.estado == EstadoPQRSD.respondida
+        else None
+    )
+    if aprobada is None:
+        raise HTTPException(status_code=404, detail=MENSAJE_NO_ENCONTRADO)
+    return respuesta_pdf(pqrsd, aprobada, descargar)
