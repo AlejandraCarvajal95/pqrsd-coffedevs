@@ -61,13 +61,6 @@ export default function AdminLogin() {
     }
   }
 
-  function usarDemo() {
-    setUsuario(modo.usuario_demo)
-    setClave(modo.clave_demo)
-    setInvalidos([])
-    setError(null)
-  }
-
   return (
     <div className="contenedor pagina admin-login">
       <div className="tarjeta admin-login__marco">
@@ -161,28 +154,6 @@ export default function AdminLogin() {
               {!enviando && <IconoFlecha />}
             </button>
           </form>
-
-          {modo?.credenciales_demo && (
-            <div className="admin-login__demo">
-              <p className="etiqueta-tecnica">Entorno de desarrollo</p>
-              <dl>
-                <div>
-                  <dt>Usuario</dt>
-                  <dd>{modo.usuario_demo}</dd>
-                </div>
-                <div>
-                  <dt>Clave</dt>
-                  <dd>{modo.clave_demo}</dd>
-                </div>
-              </dl>
-              <button type="button" className="boton boton--linea" onClick={usarDemo}>
-                Usar estas credenciales
-              </button>
-              <p className="admin-login__demo-nota">
-                En el servidor del evento se reemplazan con ADMIN_CLAVE.
-              </p>
-            </div>
-          )}
         </section>
       </div>
     </div>
